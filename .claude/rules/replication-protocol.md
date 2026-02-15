@@ -1,6 +1,7 @@
 ---
 paths:
   - "scripts/**/*.R"
+  - "scripts/**/*.py"
   - "Figures/**/*.R"
 ---
 
@@ -39,14 +40,23 @@ Before writing any R code:
 
 ### Stata to R Translation Pitfalls
 
-<!-- Customize: Add pitfalls specific to your field -->
-
 | Stata | R | Trap |
 |-------|---|------|
 | `reg y x, cluster(id)` | `feols(y ~ x, cluster = ~id)` | Stata clusters df-adjust differently from some R packages |
 | `areg y x, absorb(id)` | `feols(y ~ x \| id)` | Check demeaning method matches |
 | `probit` for PS | `glm(family=binomial(link="probit"))` | R default logit != Stata default in some commands |
 | `bootstrap, reps(999)` | Depends on method | Match seed, reps, and bootstrap type exactly |
+
+### Stata to Python Translation Pitfalls
+
+| Stata | Python | Trap |
+|-------|--------|------|
+| `reg y x, cluster(id)` | `sm.OLS(...).fit(cov_type='cluster', cov_kwds={'groups': df['id']})` | statsmodels clustering differs from Stata's small-sample adjustment |
+| `areg y x, absorb(id)` | `linearmodels.PanelOLS(..., entity_effects=True)` | Demeaning method and df correction may differ |
+| `winsor2 var, cuts(1 99)` | `scipy.stats.mstats.winsorize(var, limits=[0.01, 0.01])` | Stata winsor2 uses percentiles; scipy uses proportions |
+| `collapse (mean) y, by(id)` | `df.groupby('id')['y'].mean()` | pandas excludes NaN by default; Stata includes |
+| `merge 1:1 id using ...` | `pd.merge(..., validate='1:1')` | pandas merge without validate silently creates duplicates |
+| `xtset id t` | `df = df.set_index(['id', 't'])` | Panel structure must be explicit in Python |
 
 ---
 

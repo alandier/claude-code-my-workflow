@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-Quality Scoring System for Academic Course Materials
+Quality Scoring System for Academic Research Materials
 
 Calculates objective quality scores (0-100) based on defined rubrics.
 Enforces quality gates: 80 (commit), 90 (PR), 95 (excellence).
 
+Supported file types: .qmd, .tex, .R, .py
+
 Usage:
     python scripts/quality_score.py Quarto/Lecture6_Topic.qmd
-    python scripts/quality_score.py Quarto/Lecture6_Topic.qmd --summary
-    python scripts/quality_score.py Quarto/*.qmd
     python scripts/quality_score.py Slides/Lecture01_Topic.tex
     python scripts/quality_score.py scripts/R/Lecture06_simulations.R
+    python scripts/quality_score.py scripts/python/01_data_inventory.py
+    python scripts/quality_score.py scripts/python/*.py --summary
 """
 
 import sys
@@ -76,6 +78,24 @@ BEAMER_RUBRIC = {
     },
     'minor': {
         'font_size_reduction': {'points': 1},
+    }
+}
+
+PYTHON_SCRIPT_RUBRIC = {
+    'critical': {
+        'syntax_error': {'points': 100, 'auto_fail': True},
+        'domain_bug': {'points': 30},
+        'hardcoded_path': {'points': 20},
+    },
+    'major': {
+        'memory_inefficient_loading': {'points': 15},
+        'missing_seed': {'points': 10},
+        'missing_figure_export': {'points': 5},
+        'missing_data_export': {'points': 5},
+    },
+    'minor': {
+        'style_violation': {'points': 1},
+        'missing_docstring': {'points': 1},
     }
 }
 
@@ -489,6 +509,89 @@ class QualityScorer:
         self.score = max(0, self.score)
         return self._generate_report()
 
+    def score_python_script(self) -> Dict:
+        """Score Python script quality."""
+        import ast
+
+        content = self.filepath.read_text(encoding='utf-8')
+
+        # Check syntax
+        try:
+            ast.parse(content)
+        except SyntaxError as e:
+            self.auto_fail = True
+            self.issues['critical'].append({
+                'type': 'syntax_error',
+                'description': f'Python syntax error at line {e.lineno}',
+                'details': str(e.msg)[:200],
+                'points': 100
+            })
+            self.score = 0
+            return self._generate_report()
+
+        # Check hardcoded paths (exclude DATA_DIR definition lines)
+        lines = content.split('\n')
+        for i, line in enumerate(lines, 1):
+            stripped = line.strip()
+            # Skip comments
+            if stripped.startswith('#'):
+                continue
+            # Skip DATA_DIR definition
+            if 'DATA_DIR' in line and '=' in line:
+                continue
+            # Check for absolute paths
+            if re.search(r'["\'][/\\](?:Users|home|tmp)', line):
+                if not re.search(r'http:|https:', line):
+                    self.issues['critical'].append({
+                        'type': 'hardcoded_path',
+                        'description': f'Hardcoded absolute path at line {i}',
+                        'details': 'Use pathlib.Path with DATA_DIR constant',
+                        'points': 20
+                    })
+                    self.score -= 20
+
+        # Check for seed if randomness detected
+        has_random = any(fn in content for fn in [
+            'np.random', 'random.seed', 'random.choice',
+            'random.sample', 'random.shuffle'
+        ])
+        has_seed = 'random.seed' in content
+        if has_random and not has_seed:
+            self.issues['major'].append({
+                'type': 'missing_seed',
+                'description': 'Missing np.random.seed() for reproducibility',
+                'details': 'Add np.random.seed(YYYYMMDD) after imports',
+                'points': 10
+            })
+            self.score -= 10
+
+        # Check for figure export
+        has_plot = any(fn in content for fn in ['plt.', 'matplotlib', 'seaborn', 'sns.'])
+        has_savefig = 'savefig' in content
+        if has_plot and not has_savefig:
+            self.issues['major'].append({
+                'type': 'missing_figure_export',
+                'description': 'Plotting code found but no savefig()',
+                'details': 'Export figures as PDF + PNG with savefig()',
+                'points': 5
+            })
+            self.score -= 5
+
+        # Check for data export
+        has_dataframe = 'DataFrame' in content or 'read_csv' in content or 'read_parquet' in content
+        has_export = any(fn in content for fn in ['to_parquet', 'to_csv', 'pickle.dump', 'to_pickle'])
+        if has_dataframe and not has_export:
+            self.issues['major'].append({
+                'type': 'missing_data_export',
+                'description': 'Data loaded/created but no export found',
+                'details': 'Save processed data with to_parquet() or to_csv()',
+                'points': 5
+            })
+            self.score -= 5
+
+        self.score = max(0, self.score)
+        return self._generate_report()
+
     def score_beamer(self) -> Dict:
         """Score Beamer/LaTeX lecture slides."""
         content = self.filepath.read_text(encoding='utf-8')
@@ -672,15 +775,12 @@ class QualityScorer:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Calculate quality scores for course materials',
+        description='Calculate quality scores for research materials (.qmd, .tex, .R, .py)',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Score a single Quarto file
+  # Score a Quarto file
   python scripts/quality_score.py Quarto/Lecture6_Topic.qmd
-
-  # Score multiple files
-  python scripts/quality_score.py Quarto/*.qmd
 
   # Score a Beamer/LaTeX file
   python scripts/quality_score.py Slides/Lecture01_Topic.tex
@@ -688,11 +788,17 @@ Examples:
   # Score an R script
   python scripts/quality_score.py scripts/R/Lecture06_simulations.R
 
+  # Score a Python script
+  python scripts/quality_score.py scripts/python/01_data_inventory.py
+
+  # Score multiple Python files
+  python scripts/quality_score.py scripts/python/*.py
+
   # Summary only (no detailed issues)
-  python scripts/quality_score.py Quarto/Lecture6.qmd --summary
+  python scripts/quality_score.py scripts/python/01_data_inventory.py --summary
 
   # Verbose output (include minor issues)
-  python scripts/quality_score.py Quarto/Lecture6.qmd --verbose
+  python scripts/quality_score.py scripts/python/01_data_inventory.py --verbose
 
 Quality Thresholds:
   80/100 = Commit threshold (blocks if below)
@@ -731,6 +837,8 @@ Exit Codes:
                 report = scorer.score_r_script()
             elif filepath.suffix == '.tex':
                 report = scorer.score_beamer()
+            elif filepath.suffix == '.py':
+                report = scorer.score_python_script()
             else:
                 print(f"Error: Unsupported file type: {filepath.suffix}")
                 continue

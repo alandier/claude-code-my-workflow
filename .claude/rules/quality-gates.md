@@ -3,6 +3,8 @@ paths:
   - "Slides/**/*.tex"
   - "Quarto/**/*.qmd"
   - "scripts/**/*.R"
+  - "scripts/**/*.py"
+  - "Paper/**/*.tex"
 ---
 
 # Quality Gates & Scoring Rubrics
@@ -26,6 +28,20 @@ paths:
 | Major | Notation inconsistency | -3 |
 | Minor | Font size reduction | -1 per slide |
 | Minor | Long lines (>100 chars) | -1 (EXCEPT documented math formulas) |
+
+## Python Scripts (.py)
+
+| Severity | Issue | Deduction |
+|----------|-------|-----------|
+| Critical | Syntax errors | -100 |
+| Critical | Domain-specific bugs (wrong ratio, currency mixing) | -30 |
+| Critical | Hardcoded absolute paths (except DATA_DIR) | -20 |
+| Major | Memory-inefficient loading (no usecols on large CSV) | -15 |
+| Major | Missing np.random.seed() (when stochastic) | -10 |
+| Major | Missing figure export (no savefig) | -5 |
+| Major | Missing data export (no to_parquet/to_csv) | -5 |
+| Minor | Style violation | -1 |
+| Minor | Missing docstring | -1 |
 
 ## R Scripts (.R)
 
@@ -58,10 +74,11 @@ Save to `quality_reports/merges/YYYY-MM-DD_[branch-name].md`.
 
 ## Tolerance Thresholds (Research)
 
-<!-- Customize for your domain -->
-
 | Quantity | Tolerance | Rationale |
 |----------|-----------|-----------|
-| Point estimates | [e.g., 1e-6] | [Numerical precision] |
-| Standard errors | [e.g., 1e-4] | [MC variability] |
-| Coverage rates | [e.g., +/- 0.01] | [MC with B reps] |
+| Valuation ratios (P/E, P/B, EV/EBITDA) | +/- 0.001 | 3 decimal places for ratios |
+| Returns | +/- 0.0001 (1 bp) | Basis point precision |
+| Regression coefficients | +/- 1e-6 | Numerical precision |
+| Standard errors | +/- 1e-4 | Clustering variability |
+| Sample sizes (N) | Exact | No reason for any difference |
+| R-squared | +/- 0.001 | Display rounding |
