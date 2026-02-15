@@ -2,46 +2,83 @@ Regional M/B and ROA Summary
 ======================================================================
 
   US:
-    Obs: 189,411
+    Obs: 188,364
     Countries: 1
-    Firms: 19,268
-    Years: 1986–2025
+    Firms: 19,245
+    Years: 1986–2024
     Median log(M/B): 0.610
-    Mean log(M/B):   0.714
-    Median ROA:      0.0164
-    Mean ROA:        -0.0435
+    Mean log(M/B):   0.713
+    VW Mean log(M/B): 1.465
+    Median ROA:      0.0163
+    Mean ROA:        -0.0437
     Early M/B median: 0.501
     Late M/B median:  0.699
     Trend: UP (+0.198)
 
   Europe:
-    Obs: 119,385
+    Obs: 118,667
     Countries: 31
-    Firms: 12,908
-    Years: 1987–2025
-    Median log(M/B): 0.335
-    Mean log(M/B):   0.457
-    Median ROA:      0.0207
+    Firms: 12,901
+    Years: 1987–2024
+    Median log(M/B): 0.333
+    Mean log(M/B):   0.455
+    VW Mean log(M/B): 1.699
+    Median ROA:      0.0206
     Mean ROA:        -0.0183
     Early M/B median: 0.224
-    Late M/B median:  0.481
-    Trend: UP (+0.257)
+    Late M/B median:  0.480
+    Trend: UP (+0.255)
 
-  Asia:
-    Obs: 320,606
-    Countries: 16
-    Firms: 28,773
-    Years: 1993–2025
-    Median log(M/B): 0.268
-    Mean log(M/B):   0.332
-    Median ROA:      0.0279
-    Mean ROA:        0.0212
-    Early M/B median: 0.087
-    Late M/B median:  0.431
-    Trend: UP (+0.344)
+  Japan:
+    Obs: 60,003
+    Countries: 1
+    Firms: 4,715
+    Years: 2001–2024
+    Median log(M/B): -0.073
+    Mean log(M/B):   0.038
+    VW Mean log(M/B): 0.488
+    Median ROA:      0.0277
+    Mean ROA:        0.0209
+    Early M/B median: -0.188
+    Late M/B median:  0.022
+    Trend: UP (+0.210)
+
+  China:
+    Obs: 58,295
+    Countries: 1
+    Firms: 5,599
+    Years: 2007–2024
+    Median log(M/B): 0.995
+    Mean log(M/B):   0.987
+    VW Mean log(M/B): 1.023
+    Median ROA:      0.0316
+    Mean ROA:        0.0287
+    Early M/B median: 1.067
+    Late M/B median:  0.841
+    Trend: DOWN (-0.226)
+
+  Other Asia:
+    Obs: 200,317
+    Countries: 14
+    Firms: 18,411
+    Years: 1993–2024
+    Median log(M/B): 0.157
+    Mean log(M/B):   0.231
+    VW Mean log(M/B): 1.066
+    Median ROA:      0.0264
+    Mean ROA:        0.0190
+    Early M/B median: 0.042
+    Late M/B median:  0.328
+    Trend: UP (+0.286)
 
 ======================================================================
 M/B Gap: US minus Region (recent 5 years)
 ======================================================================
-  US - Europe: +0.212 log points (~+24% in levels)
-  US - Asia: +0.241 log points (~+27% in levels)
+  US - Europe      : +0.223 log points (~+25% in levels, EW median)
+  US - Europe      : -0.169 log points (~-16% in levels, VW mean)
+  US - Japan       : +0.681 log points (~+98% in levels, EW median)
+  US - Japan       : +1.275 log points (~+258% in levels, VW mean)
+  US - China       : -0.198 log points (~-18% in levels, EW median)
+  US - China       : +0.833 log points (~+130% in levels, VW mean)
+  US - Other Asia  : +0.398 log points (~+49% in levels, EW median)
+  US - Other Asia  : +0.827 log points (~+129% in levels, VW mean)

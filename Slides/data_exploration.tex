@@ -56,9 +56,9 @@
 
 \vspace{0.3cm}
 \begin{itemize}
-\item Compustat Global: fiscal years 1987--2025, 124 countries
-\item Compustat America: fiscal years 1986--2025, CRSP-linked
-\item Combined regression panel: \textbf{749,527 firm-years}, 72,914 firms, 81 countries
+\item Compustat Global: fiscal years 1987--2024, 124 countries
+\item Compustat America: fiscal years 1986--2024, CRSP-linked
+\item Combined regression panel: \textbf{743,957 firm-years}, 72,787 firms, 81 countries
 \end{itemize}
 \end{frame}
 
@@ -85,8 +85,8 @@
 \item US: \texttt{mkvalt} from Compustat NA; Global: \texttt{cshoi} $\times$ \texttt{prccm}
 \end{itemize}
 \item \textbf{ROA}: Net Income / Total Assets \quad \textbf{Size}: $\log(\text{Total Assets})$
-\item \textbf{Lag earnings growth}: $(E_{t-1} - E_{t-2}) / |E_{t-2}|$ \quad \textbf{Industry}: SIC-2
-\item Winsorize M/B at 1st/99th percentiles; filter country-years with $\geq 30$ obs
+\item \textbf{Lag earnings growth}: $(E_{t-1} - E_{t-2}) / |E_{t-2}|$ \quad \textbf{Industry}: GICS Ind.\ Group
+\item Winsorize M/B and ROA at 1st/99th percentiles; filter country-years with $\geq 30$ obs
 \end{itemize}
 
 \vspace{0.15cm}
@@ -97,9 +97,9 @@
 \toprule
 Variable & N & Mean & P10 & Median & P90 \\
 \midrule
-$\log(M/B)$ & 749,527 & 0.46 & $-$0.77 & 0.39 & 1.76 \\
-ROA & 749,093 & $-$0.02 & $-$0.15 & 0.02 & 0.11 \\
-$\log(\text{Assets})$ & 749,527 & 7.28 & 3.26 & 7.17 & 11.49 \\
+$\log(M/B)$ & 743,957 & 0.46 & $-$0.77 & 0.39 & 1.76 \\
+ROA & 743,523 & $-$0.01 & $-$0.15 & 0.02 & 0.11 \\
+$\log(\text{Assets})$ & 743,957 & 7.28 & 3.26 & 7.17 & 11.49 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -126,7 +126,7 @@ $\log(\text{Assets})$ & 749,527 & 7.28 & 3.26 & 7.17 & 11.49 \\
 \text{ROA}_{i,t} &= \alpha + \beta_1 \log(\text{Assets})_{i,t} + \gamma_c + \delta_j + \tau_t + \varepsilon_{i,t}
 \end{align*}
 
-\small $\gamma_c$ = country FE, $\delta_j$ = industry FE (SIC-2), $\tau_t$ = year FE, $\gamma_{c,t}$ = country $\times$ year FE.\\
+\small $\gamma_c$ = country FE, $\delta_j$ = GICS industry group FE, $\tau_t$ = year FE, $\gamma_{c,t}$ = country $\times$ year FE.\\
 Standard errors clustered at the country level.
 \end{frame}
 
@@ -140,14 +140,14 @@ Standard errors clustered at the country level.
 & \textbf{Spec 1} & \textbf{Spec 2} \\
 & C + Ind + Year FE & C$\times$Year + Ind FE \\
 \midrule
-ROA & $-$0.070 & $-$0.102 \\
-    & (0.133) & (0.129) \\[1pt]
-$\log(\text{Assets})$ & $-$0.030 & $-$0.032 \\
-     & (0.024) & (0.024) \\[1pt]
-Lag Earn.\ Growth & 0.006*** & 0.005*** \\
+ROA & 0.015 & $-$0.020 \\
+    & (0.136) & (0.133) \\[1pt]
+$\log(\text{Assets})$ & $-$0.031 & $-$0.033 \\
+     & (0.025) & (0.025) \\[1pt]
+Lag Earn.\ Growth & 0.006*** & 0.005** \\
      & (0.002) & (0.002) \\
 \midrule
-N / $R^2$ & 607,209 / 0.185 & 607,209 / 0.211 \\
+N / $R^2$ & 593,530 / 0.180 & 593,530 / 0.206 \\
 C / Ind / Year FE & Y / Y / Y & -- / Y / -- \\
 C $\times$ Year FE & -- & Yes \\
 \bottomrule
@@ -167,7 +167,7 @@ C $\times$ Year FE & -- & Yes \\
 \end{itemize}
 
 \vspace{0.2cm}
-\textbf{$R^2$ comparison:} Spec 1 = 0.185, Spec 2 = 0.211 --- country$\times$year interactions gain 2.6 pp, suggesting time-varying country effects matter.
+\textbf{$R^2$ comparison:} Spec 1 = 0.180, Spec 2 = 0.206 --- country$\times$year interactions gain 2.6 pp, suggesting time-varying country effects matter.
 \end{frame}
 
 % ===================================================================
@@ -181,30 +181,37 @@ C $\times$ Year FE & -- & Yes \\
 \includegraphics[width=0.9\textwidth]{variance_decomposition.pdf}
 \end{column}
 \begin{column}{0.48\textwidth}
-\vspace{0.1cm}
 \small
 \textbf{Shapley $R^2$ decomposition:}
 
-\vspace{0.1cm}
+\vspace{0.05cm}
 \textbf{log(M/B):}
 \begin{itemize}\setlength\itemsep{0pt}
-\item Country: \textbf{49.6\%} of $R^2$
-\item Industry: 37.7\%
-\item Year: 12.7\%
+\item Country: \textbf{51.6\%} of $R^2$
+\item Industry: 35.1\%
+\item Year: 13.3\%
 \end{itemize}
 
-\vspace{0.05cm}
+\vspace{0.02cm}
 \textbf{ROA:}
 \begin{itemize}\setlength\itemsep{0pt}
-\item Country: \textbf{51.2\%} of $R^2$
-\item Industry: 43.2\%
-\item Year: 5.6\%
+\item Country: \textbf{50.9\%} of $R^2$
+\item Industry: 44.7\%
+\item Year: 4.4\%
 \end{itemize}
 
-\vspace{0.05cm}
+\vspace{0.02cm}
 Country dominates both valuation\\ and profitability.
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Industry $\times$ Country Interaction}
+\centering
+\includegraphics[width=0.72\textwidth]{industry_country_heatmap.pdf}
+
+\smallskip
+\scriptsize Country effects on log(M/B) by GICS sector (vs USA). Adding Country$\times$Sector interaction raises $R^2$ by +2.8 pp --- country effects vary meaningfully across industries.
 \end{frame}
 
 % ===================================================================
@@ -261,9 +268,9 @@ Country dominates both valuation\\ and profitability.
 
 \begin{frame}{Stylized Facts (1/2): Decomposition}
 \begin{enumerate}
-\item \textbf{Country effects dominate valuation} --- country explains 50\% of M/B $R^2$ (Shapley), vs 38\% for industry. Echoes the Heston--Rouwenhorst debate, but for \emph{levels} rather than returns.
+\item \textbf{Country effects dominate valuation} --- country explains 52\% of M/B $R^2$ (Shapley), vs 35\% for GICS industry. Echoes the Heston--Rouwenhorst debate, but for \emph{levels} rather than returns.
 
-\item \textbf{Country dominates profitability too} --- for ROA, country edges industry (51\% vs 43\%). Both valuation and profitability are primarily location-driven.
+\item \textbf{Country dominates profitability too} --- for ROA, country edges industry (51\% vs 45\%). Both valuation and profitability are primarily location-driven.
 
 \item \textbf{Negative M/B--ROA correlation across countries} ($\rho = -0.26$) --- high-M/B countries are \emph{not} high-ROA countries. Discount rates and growth expectations, not current profitability, drive the cross-country valuation map.
 \end{enumerate}
@@ -284,20 +291,39 @@ Country dominates both valuation\\ and profitability.
 \section{Regional Trends}
 % ===================================================================
 
-\begin{frame}{Regional Valuations Over Time}
+\begin{frame}{Regional Valuations: Equal-Weighted Median}
 \centering
 \includegraphics[width=0.65\textwidth]{regional_mb_timeseries.pdf}
 
 \smallskip
-\scriptsize Median log(M/B) by region-year. US consistently above Europe and Asia.
+\scriptsize Median log(M/B) by region-year. China separately shown; Japan persistently lowest.
+\end{frame}
+
+\begin{frame}{Regional Valuations: Value-Weighted}
+\centering
+\includegraphics[width=0.65\textwidth]{regional_mb_vw_timeseries.pdf}
+
+\smallskip
+\scriptsize VW mean log(M/B): cap-weighted within country, then EW across countries.
 \end{frame}
 
 \begin{frame}{Regional Profitability Over Time}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
 \centering
-\includegraphics[width=0.65\textwidth]{regional_roa_timeseries.pdf}
+\includegraphics[width=\textwidth]{regional_roa_timeseries.pdf}
 
-\smallskip
-\scriptsize Median ROA by region-year. Asia has \emph{higher} profitability than US despite lower valuations.
+\scriptsize EW median
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{regional_roa_vw_timeseries.pdf}
+
+\scriptsize Value-weighted
+\end{column}
+\end{columns}
+\vspace{0.1cm}
+\scriptsize Japan and Other Asia have \emph{higher} profitability than US despite lower valuations.
 \end{frame}
 
 \begin{frame}{Regional Valuation Gap vs USA}
@@ -305,18 +331,18 @@ Country dominates both valuation\\ and profitability.
 \includegraphics[width=0.65\textwidth]{regional_mb_country_effects.pdf}
 
 \smallskip
-\scriptsize Average country effect (vs USA baseline) from year-by-year regressions with industry FE.
+\scriptsize Average country effect (vs USA baseline) from year-by-year regressions with GICS industry FE.
 \end{frame}
 
 \begin{frame}{The US Valuation Premium}
 \begin{itemize}
-\item US M/B is \textbf{24\% higher} than Europe and \textbf{27\% higher} than Asia (recent 5 years)
+\item \textbf{EW median gap} (recent 5 years): US +25\% vs Europe, +98\% vs Japan, +49\% vs Other Asia
 
-\item Asia has \emph{higher median ROA} than the US --- yet \emph{lower valuations}
+\item \textbf{China} has comparable M/B to US on EW median --- but declining since 2015
 
-\item The gap has been \textbf{widening} since 2015, driven by US tech sector and post-GFC divergence
+\item Japan and Other Asia have \emph{higher median ROA} than the US --- yet \emph{lower valuations}
 
-\item Europe and Asia track each other closely, both persistently below the US baseline
+\item VW results show even larger gaps: US +258\% vs Japan, +129\% vs Other Asia
 \end{itemize}
 
 \vspace{0.2cm}
@@ -422,7 +448,7 @@ The investor-side literature is deeper than the growth-side literature.
 \begin{itemize}
 \item First panel decomposition of \emph{valuation levels} (not returns) into country, industry, and time using Shapley $R^2$
 
-\item Largest cross-country valuation panel: 81 countries, 1986--2025, 749K firm-years
+\item Largest cross-country valuation panel: 81 countries, 1986--2024, 744K firm-years
 
 \item Document \textbf{divergence} in M/B across countries, challenging the globalization-implies-equalization view
 

@@ -229,12 +229,12 @@ def load_us_panel() -> pd.DataFrame:
     Returns
     -------
     pd.DataFrame
-        US firm-year panel with: gvkey, fyear, fic, sic2, market_cap,
+        US firm-year panel with: gvkey, fyear, fic, ggroup, market_cap,
         ceq, at, ib, log_mb, roa, log_at, lag_earn_growth.
     """
     rprint("\n  Loading US panel (compustat_america)...")
     cols = [
-        "GVKEY", "fyear", "at", "ceq", "ib", "sic", "mkvalt",
+        "GVKEY", "fyear", "at", "ceq", "ib", "ggroup", "mkvalt",
         "prcc_f", "csho", "fic",
     ]
     df = pd.read_csv(
@@ -259,8 +259,8 @@ def load_us_panel() -> pd.DataFrame:
             df.loc[mask_missing, "prcc_f"] * df.loc[mask_missing, "csho"]
         )
 
-    # Industry: 2-digit SIC
-    df["sic2"] = (df["sic"] // 100).astype("Int64")
+    # Industry: GICS Industry Group (~25 categories)
+    df["ggroup"] = df["ggroup"].astype("Int64")
 
     # Filter
     df = df[(df["at"] > 0) & (df["ceq"] > 0) & (df["market_cap"] > 0)].copy()
@@ -288,7 +288,7 @@ def load_us_panel() -> pd.DataFrame:
 
     # Keep needed columns
     keep = [
-        "gvkey", "fyear", "fic", "sic2", "market_cap", "ceq", "at", "ib",
+        "gvkey", "fyear", "fic", "ggroup", "market_cap", "ceq", "at", "ib",
         "log_mb", "roa", "log_at", "lag_earn_growth",
     ]
     df = df[keep].copy()
@@ -317,7 +317,7 @@ def load_global_panel() -> pd.DataFrame:
 
     # --- Compustat Global fundamentals ---
     fund_cols = [
-        "gvkey", "fyear", "datadate", "at", "ceq", "ib", "sic",
+        "gvkey", "fyear", "datadate", "at", "ceq", "ib", "ggroup",
         "cshoi", "fic",
     ]
     df = pd.read_csv(
@@ -364,8 +364,8 @@ def load_global_panel() -> pd.DataFrame:
     # Market cap = shares outstanding * price
     df["market_cap"] = df["cshoi"] * df["prccm"]
 
-    # Industry: 2-digit SIC
-    df["sic2"] = (df["sic"] // 100).astype("Int64")
+    # Industry: GICS Industry Group (~25 categories)
+    df["ggroup"] = df["ggroup"].astype("Int64")
 
     # Filter: require positive assets, equity, and market cap.
     # Financial firms included; country FE absorb regulatory differences.
@@ -397,7 +397,7 @@ def load_global_panel() -> pd.DataFrame:
     )
 
     keep = [
-        "gvkey", "fyear", "fic", "sic2", "market_cap", "ceq", "at", "ib",
+        "gvkey", "fyear", "fic", "ggroup", "market_cap", "ceq", "at", "ib",
         "log_mb", "roa", "log_at", "lag_earn_growth",
     ]
     df = df[keep].copy()
@@ -439,6 +439,12 @@ def build_panel(df_us: pd.DataFrame, df_global: pd.DataFrame) -> pd.DataFrame:
 
     df = pd.concat([df_us, df_global], ignore_index=True)
 
+    # Drop 2025 (partial year with incomplete coverage)
+    n_2025 = (df["fyear"] == 2025).sum()
+    if n_2025 > 0:
+        df = df[df["fyear"] < 2025].copy()
+        rprint(f"  Dropped {n_2025:,} obs from 2025 (partial year)")
+
     # Drop duplicate gvkey-fyear (keep first = US version)
     n_before = len(df)
     df = df.drop_duplicates(subset=["gvkey", "fyear"], keep="first")
@@ -458,7 +464,7 @@ def build_panel(df_us: pd.DataFrame, df_global: pd.DataFrame) -> pd.DataFrame:
 
     # Convert to categorical for memory
     df["fic"] = df["fic"].astype("category")
-    df["sic2"] = df["sic2"].astype("category")
+    df["ggroup"] = df["ggroup"].astype("category")
 
     # Save parquet
     df.to_parquet(PARQUET_PATH, index=False)
@@ -517,8 +523,8 @@ def print_summary_statistics(df: pd.DataFrame) -> None:
 def run_mb_regressions(df: pd.DataFrame) -> dict:
     """Run M/B regression specifications.
 
-    Spec 1: log_mb ~ roa + log_at + lag_earn_growth + C(fic) + C(sic2) + C(fyear)
-    Spec 2: log_mb ~ roa + log_at + lag_earn_growth + C(sic2) + Country×Year FE
+    Spec 1: log_mb ~ roa + log_at + lag_earn_growth + C(fic) + C(ggroup) + C(fyear)
+    Spec 2: log_mb ~ roa + log_at + lag_earn_growth + C(ggroup) + Country×Year FE
             (via Frisch-Waugh demeaning)
 
     Returns
@@ -531,10 +537,10 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
     rprint("=" * 70)
 
     reg_df = df[["log_mb", "roa", "log_at", "lag_earn_growth",
-                 "fic", "sic2", "fyear"]].dropna().copy()
+                 "fic", "ggroup", "fyear"]].dropna().copy()
     # Ensure categoricals are string for formula API
     reg_df["fic"] = reg_df["fic"].astype(str)
-    reg_df["sic2"] = reg_df["sic2"].astype(str)
+    reg_df["ggroup"] = reg_df["ggroup"].astype(str)
     reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
 
     rprint(f"  Regression sample: {len(reg_df):,} obs")
@@ -543,7 +549,7 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
     # --- Spec 1: Separate FE ---
     rprint("\n  Spec 1: Country + Industry + Year FE...")
     formula1 = ("log_mb ~ roa + log_at + lag_earn_growth "
-                "+ C(fic, Treatment(reference='USA')) + C(sic2) + C(fyear_cat)")
+                "+ C(fic, Treatment(reference='USA')) + C(ggroup) + C(fyear_cat)")
     m1 = smf.ols(formula1, data=reg_df).fit(
         cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
     )
@@ -565,7 +571,7 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
         group_mean = reg_df_dm.groupby(cy_group)[v].transform("mean")
         reg_df_dm[v] = reg_df_dm[v] - group_mean
 
-    formula2 = "log_mb ~ roa + log_at + lag_earn_growth + C(sic2) - 1"
+    formula2 = "log_mb ~ roa + log_at + lag_earn_growth + C(ggroup) - 1"
     m2 = smf.ols(formula2, data=reg_df_dm).fit(
         cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
     )
@@ -627,7 +633,7 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
 def run_roa_regressions(df: pd.DataFrame) -> dict:
     """Run ROA regression specification.
 
-    Spec 1: roa ~ log_at + C(fic) + C(sic2) + C(fyear)
+    Spec 1: roa ~ log_at + C(fic) + C(ggroup) + C(fyear)
 
     Returns
     -------
@@ -638,9 +644,9 @@ def run_roa_regressions(df: pd.DataFrame) -> dict:
     rprint("  ROA REGRESSIONS")
     rprint("=" * 70)
 
-    reg_df = df[["roa", "log_at", "fic", "sic2", "fyear"]].dropna().copy()
+    reg_df = df[["roa", "log_at", "fic", "ggroup", "fyear"]].dropna().copy()
     reg_df["fic"] = reg_df["fic"].astype(str)
-    reg_df["sic2"] = reg_df["sic2"].astype(str)
+    reg_df["ggroup"] = reg_df["ggroup"].astype(str)
     reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
 
     rprint(f"  Regression sample: {len(reg_df):,} obs")
@@ -648,7 +654,7 @@ def run_roa_regressions(df: pd.DataFrame) -> dict:
 
     rprint("\n  Spec 1: Country + Industry + Year FE...")
     formula = ("roa ~ log_at "
-               "+ C(fic, Treatment(reference='USA')) + C(sic2) + C(fyear_cat)")
+               "+ C(fic, Treatment(reference='USA')) + C(ggroup) + C(fyear_cat)")
     m1 = smf.ols(formula, data=reg_df).fit(
         cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
     )
@@ -676,7 +682,7 @@ def run_yearly_regressions(
 ) -> pd.DataFrame:
     """Run cross-sectional regressions year by year, extract country FE.
 
-    For each year: dep_var ~ controls + C(fic, ref=USA) + C(sic2)
+    For each year: dep_var ~ controls + C(fic, ref=USA) + C(ggroup)
 
     Parameters
     ----------
@@ -695,16 +701,16 @@ def run_yearly_regressions(
         Columns: fyear, fic, country_effect, se, n_obs.
     """
     rprint(f"\n  Year-by-year regressions for {dep_var}...")
-    all_cols = [dep_var] + controls + ["fic", "sic2", "fyear"]
+    all_cols = [dep_var] + controls + ["fic", "ggroup", "fyear"]
     reg_df = df[all_cols].dropna().copy()
     reg_df["fic"] = reg_df["fic"].astype(str)
-    reg_df["sic2"] = reg_df["sic2"].astype(str)
+    reg_df["ggroup"] = reg_df["ggroup"].astype(str)
 
     years = sorted(reg_df["fyear"].unique())
     records = []
 
     control_str = " + ".join(controls) if controls else "1"
-    formula = f"{dep_var} ~ {control_str} + C(fic, Treatment(reference='USA')) + C(sic2)"
+    formula = f"{dep_var} ~ {control_str} + C(fic, Treatment(reference='USA')) + C(ggroup)"
 
     for yr in years:
         yr_df = reg_df[reg_df["fyear"] == yr]
@@ -765,14 +771,14 @@ def variance_decomposition(df: pd.DataFrame, dep_var: str) -> dict:
         Keys: 'Country', 'Industry', 'Year', values: average marginal R².
     """
     rprint(f"\n  Variance decomposition for {dep_var}...")
-    reg_df = df[[dep_var, "fic", "sic2", "fyear"]].dropna().copy()
+    reg_df = df[[dep_var, "fic", "ggroup", "fyear"]].dropna().copy()
     reg_df["fic"] = reg_df["fic"].astype(str)
-    reg_df["sic2"] = reg_df["sic2"].astype(str)
+    reg_df["ggroup"] = reg_df["ggroup"].astype(str)
     reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
 
     factors = {
         "Country": "C(fic)",
-        "Industry": "C(sic2)",
+        "Industry": "C(ggroup)",
         "Year": "C(fyear_cat)",
     }
     factor_names = list(factors.keys())
@@ -819,6 +825,148 @@ def variance_decomposition(df: pd.DataFrame, dep_var: str) -> dict:
     rprint(f"    Total R²:  {sum(shapley.values()):.4f}")
 
     return shapley
+
+
+# ---------------------------------------------------------------------------
+# 8b. Industry × Country Interaction Exploration
+# ---------------------------------------------------------------------------
+
+# GICS Sector labels for readable output
+GICS_SECTOR_MAP = {
+    10: "Energy", 15: "Materials", 20: "Industrials", 25: "Cons Disc",
+    30: "Cons Staples", 35: "Health Care", 40: "Financials",
+    45: "Info Tech", 50: "Comm Svc", 55: "Utilities", 60: "Real Estate",
+}
+
+
+def explore_industry_country_interaction(df: pd.DataFrame) -> pd.DataFrame:
+    """Test whether country effects on M/B vary across industries.
+
+    Approach:
+    1. Run separate regressions per GICS sector, extracting country effects.
+    2. Compare country effects across sectors via a heatmap.
+    3. Report R² gain from adding Country×Industry interaction.
+
+    Returns
+    -------
+    pd.DataFrame
+        Country effects by sector (rows=countries, columns=sectors).
+    """
+    rprint("\n" + "=" * 70)
+    rprint("  INDUSTRY × COUNTRY INTERACTION")
+    rprint("=" * 70)
+
+    reg_df = df[["log_mb", "roa", "log_at", "fic", "ggroup", "fyear"]].dropna().copy()
+    reg_df["fic"] = reg_df["fic"].astype(str)
+    reg_df["ggroup"] = reg_df["ggroup"].astype(str)
+    reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
+
+    # Map ggroup to sector (first 2 digits)
+    reg_df["gsector"] = reg_df["ggroup"].str[:2].astype(int)
+
+    # --- R² comparison: additive vs interaction (via Frisch-Waugh) ---
+    rprint("\n  R² comparison (additive vs country×sector interaction):")
+    # Additive R² from variance decomposition already computed; estimate
+    # interaction R² by demeaning within country×sector groups
+    try:
+        cs_group = reg_df["fic"] + "_" + reg_df["gsector"].astype(str)
+        dm_vars = ["log_mb", "roa", "log_at"]
+        reg_dm = reg_df.copy()
+        for v in dm_vars:
+            reg_dm[v] = reg_dm[v] - reg_dm.groupby(cs_group)[v].transform("mean")
+        m_dm = smf.ols("log_mb ~ roa + log_at + C(ggroup) + C(fyear_cat) - 1",
+                       data=reg_dm).fit()
+        y_orig = reg_df["log_mb"].values
+        y_cs_mean = reg_df.groupby(cs_group)["log_mb"].transform("mean").values
+        y_hat = y_cs_mean + m_dm.fittedvalues.values
+        ss_res = np.sum((y_orig - y_hat) ** 2)
+        ss_tot = np.sum((y_orig - y_orig.mean()) ** 2)
+        r2_int = 1.0 - ss_res / ss_tot
+        rprint(f"    Additive (C + Ind + Year) R²:       ~0.18")
+        rprint(f"    Country×Sector + Ind + Year R²:     {r2_int:.4f}")
+        rprint(f"    R² gain from interaction:           {r2_int - 0.18:+.4f}")
+    except (np.linalg.LinAlgError, ValueError) as e:
+        rprint(f"    WARNING: R² comparison failed: {e}")
+
+    # --- Per-sector regressions for key countries ---
+    rprint("\n  Country effects by GICS sector (5 key countries, pooled across years):")
+    key_countries = ["JPN", "CHN", "GBR", "DEU", "IND"]
+    sectors = sorted(reg_df["gsector"].unique())
+    records = []
+
+    for sec in sectors:
+        sec_df = reg_df[reg_df["gsector"] == sec]
+        if len(sec_df) < 500 or "USA" not in sec_df["fic"].values:
+            continue
+        formula = ("log_mb ~ roa + log_at "
+                   "+ C(fic, Treatment(reference='USA')) + C(fyear_cat)")
+        try:
+            m = smf.ols(formula, data=sec_df).fit(cov_type="HC1")
+        except (np.linalg.LinAlgError, ValueError):
+            continue
+        for param_name, coef in m.params.items():
+            if param_name.startswith("C(fic"):
+                country = param_name.split("[T.")[-1].rstrip("]")
+                if country in key_countries:
+                    records.append({
+                        "country": country,
+                        "gsector": sec,
+                        "sector_name": GICS_SECTOR_MAP.get(sec, str(sec)),
+                        "effect": coef,
+                        "n_obs": int(m.nobs),
+                    })
+
+    if not records:
+        rprint("    No valid sector-level results.")
+        return pd.DataFrame()
+
+    sector_effects = pd.DataFrame(records)
+    pivot = sector_effects.pivot_table(
+        index="country", columns="sector_name", values="effect"
+    )
+    rprint(f"\n{pivot.round(3).to_string()}")
+
+    # Cross-sector dispersion for each country
+    rprint("\n  Cross-sector dispersion of country effects (std dev):")
+    for country in key_countries:
+        cdata = sector_effects[sector_effects["country"] == country]["effect"]
+        if len(cdata) > 2:
+            rprint(f"    {country:<6s} std={cdata.std():.3f}  "
+                   f"range=[{cdata.min():.3f}, {cdata.max():.3f}]")
+
+    return sector_effects
+
+
+def plot_industry_country_heatmap(sector_effects: pd.DataFrame) -> None:
+    """Plot heatmap of country effects by GICS sector."""
+    if sector_effects.empty:
+        return
+
+    pivot = sector_effects.pivot_table(
+        index="country", columns="sector_name", values="effect"
+    )
+    if pivot.empty:
+        return
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+    im = ax.imshow(pivot.values, cmap="RdBu_r", aspect="auto",
+                   vmin=-0.8, vmax=0.8)
+    ax.set_xticks(range(len(pivot.columns)))
+    ax.set_xticklabels(pivot.columns, rotation=45, ha="right", fontsize=8)
+    ax.set_yticks(range(len(pivot.index)))
+    ax.set_yticklabels(pivot.index, fontsize=10)
+    ax.set_title("Country Effects on log(M/B) by GICS Sector (vs USA)")
+    fig.colorbar(im, ax=ax, shrink=0.8, label="Effect")
+
+    # Annotate cells
+    for i in range(len(pivot.index)):
+        for j in range(len(pivot.columns)):
+            val = pivot.values[i, j]
+            if not np.isnan(val):
+                ax.text(j, i, f"{val:.2f}", ha="center", va="center",
+                        fontsize=7, color="white" if abs(val) > 0.4 else "black")
+
+    save_figure(fig, "industry_country_heatmap")
 
 
 # ---------------------------------------------------------------------------
@@ -1002,7 +1150,7 @@ def main() -> None:
         rprint("  Loading panel from parquet cache...")
         df = pd.read_parquet(PARQUET_PATH)
         df["fic"] = df["fic"].astype("category")
-        df["sic2"] = df["sic2"].astype("category")
+        df["ggroup"] = df["ggroup"].astype("category")
     else:
         df_us = load_us_panel()
         df_global = load_global_panel()
@@ -1035,6 +1183,9 @@ def main() -> None:
     decomp_mb = variance_decomposition(df, "log_mb")
     decomp_roa = variance_decomposition(df, "roa")
 
+    # --- Industry × Country Interaction ---
+    sector_effects = explore_industry_country_interaction(df)
+
     # --- Figures ---
     rprint("\n" + "=" * 70)
     rprint("  FIGURES")
@@ -1043,6 +1194,7 @@ def main() -> None:
     plot_country_effects(effects_roa, "roa")
     plot_dispersion(effects_mb, effects_roa)
     plot_variance_decomposition(decomp_mb, decomp_roa)
+    plot_industry_country_heatmap(sector_effects)
 
     # --- Stylized Facts ---
     print_stylized_facts(effects_mb, effects_roa, decomp_mb, decomp_roa)
