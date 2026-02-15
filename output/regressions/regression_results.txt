@@ -1,8 +1,27 @@
 ======================================================================
   GLOBAL VALUATION — Panel Regressions
-  Date: 2026-02-15 23:49
+  Date: 2026-02-16 00:21
 ======================================================================
-  Loading panel from parquet cache...
+
+  Loading US panel (compustat_america)...
+  US panel: 220,708 obs, 22,468 firms, fyear 1986–2025
+    P/E available (ib>0): 148,129 (67%)
+
+  Loading Global panel (compustat_global + returns_global)...
+  Compustat Global loaded: 980,901 rows
+  Returns Global loaded: 10,374,902 rows
+  After merge: 596,822/980,901 have fiscal year-end price
+  After filters: 550,598 obs (dropped 430,303)
+  Global panel: 550,598 obs, 51,911 firms, 122 countries, fyear 2006–2025
+    P/E available (ib>0): 404,523 (73%)
+
+  Building combined panel...
+  Dropped 6,189 obs from 2025 (partial year)
+  Dropped 8,384 duplicate gvkey-fyear rows
+  Filtered to country-years with >= 30 obs: 756,733 → 743,957
+  Panel saved to output/regressions/panel_data.parquet
+
+  Combined panel: 743,957 obs, 72,787 firms, 81 countries, fyear 1986–2024
 
 ======================================================================
   SUMMARY STATISTICS
@@ -16,7 +35,9 @@
 
   Variable                    N     Mean      Std      P10   Median      P90
   --------------------------------------------------------------------
+  log_pe                532,028    2.955    1.133    1.768    2.799    4.351
   log_mb                743,957    0.455    1.047   -0.768    0.385    1.756
+  leverage              743,957    0.487    0.253    0.136    0.492    0.845
   roa                   743,523   -0.012    0.184   -0.147    0.023    0.109
   log_at                743,957    7.276    3.179    3.268    7.168   11.482
   lag_earn_growth       603,073   -0.045    3.807   -1.579    0.072    1.691
@@ -34,36 +55,78 @@
     MYS      16,698
 
 ======================================================================
+  P/E REGRESSIONS (profitable firms only)
+======================================================================
+  Regression sample: 428,722 obs (ib > 0)
+
+  Spec 1: Country + Industry + Year FE...
+    N=428,722, R²=0.1330
+    leverage:         -0.0167 (se=0.1048)
+    log_at:           -0.0680 (se=0.0299)
+    lag_earn_growth:  -0.0163 (se=0.0031)
+
+  Spec 2: Country×Year FE (Frisch-Waugh demeaning)...
+    N=428,722, R²=0.1543
+    leverage:         -0.0137
+    log_at:           -0.0695
+    lag_earn_growth:  -0.0161
+
+================================================================================
+  Dependent variable: log(P/E)
+================================================================================
+  Variable                            Spec 1           Spec 2
+  -----------------------------------------------------------
+  leverage                        -0.0167          -0.0137   
+                             (    0.1048)    (    0.1022)  
+  log_at                          -0.0680**        -0.0695** 
+                             (    0.0299)    (    0.0303)  
+  lag_earn_growth                 -0.0163***       -0.0161***
+                             (    0.0031)    (    0.0031)  
+  -----------------------------------------------------------
+  N                                  428,722          428,722
+  R-squared                           0.1330           0.1543
+  Country FE                             Yes               No
+  Industry FE                            Yes              Yes
+  Year FE                                Yes               No
+  Country x Year FE                       No              Yes
+================================================================================
+
+
+======================================================================
   M/B REGRESSIONS
 ======================================================================
   Regression sample: 593,530 obs
 
   Spec 1: Country + Industry + Year FE...
-    N=593,530, R²=0.1795
-    roa:              0.0153 (se=0.1359)
-    log_at:           -0.0311 (se=0.0245)
-    lag_earn_growth:  0.0056 (se=0.0018)
+    N=593,530, R²=0.2114
+    roa:              0.2323 (se=0.1601)
+    leverage:         0.9108 (se=0.0640)
+    log_at:           -0.0679 (se=0.0262)
+    lag_earn_growth:  0.0080 (se=0.0018)
 
   Spec 2: Country×Year FE (Frisch-Waugh demeaning)...
-    N=593,530, R²=0.2056
-    roa:              -0.0196
-    log_at:           -0.0329
-    lag_earn_growth:  0.0047
+    N=593,530, R²=0.2374
+    roa:              0.1976
+    leverage:         0.9101
+    log_at:           -0.0706
+    lag_earn_growth:  0.0072
 
 ================================================================================
   Dependent variable: log(M/B)
 ================================================================================
   Variable                            Spec 1           Spec 2
   -----------------------------------------------------------
-  roa                              0.0153          -0.0196   
-                             (    0.1359)    (    0.1326)  
-  log_at                          -0.0311          -0.0329   
-                             (    0.0245)    (    0.0251)  
-  lag_earn_growth                  0.0056***        0.0047** 
-                             (    0.0018)    (    0.0019)  
+  roa                              0.2323           0.1976   
+                             (    0.1601)    (    0.1563)  
+  leverage                         0.9108***        0.9101***
+                             (    0.0640)    (    0.0671)  
+  log_at                          -0.0679***       -0.0706***
+                             (    0.0262)    (    0.0270)  
+  lag_earn_growth                  0.0080***        0.0072***
+                             (    0.0018)    (    0.0018)  
   -----------------------------------------------------------
   N                                  593,530          593,530
-  R-squared                           0.1795           0.2056
+  R-squared                           0.2114           0.2374
   Country FE                             Yes               No
   Industry FE                            Yes              Yes
   Year FE                                Yes               No
@@ -77,19 +140,21 @@
   Regression sample: 730,763 obs
 
   Spec 1: Country + Industry + Year FE...
-    N=730,763, R²=0.2099
-    log_at: 0.0263 (se=0.0049)
+    N=730,763, R²=0.2336
+    log_at: 0.0311 (se=0.0052)
 
 ================================================================================
   Dependent variable: ROA
 ================================================================================
   Variable                            Spec 1
   ------------------------------------------
-  log_at                           0.0263***
-                             (    0.0049)  
+  leverage                        -0.1353***
+                             (    0.0139)  
+  log_at                           0.0311***
+                             (    0.0052)  
   ------------------------------------------
   N                                  730,763
-  R-squared                           0.2099
+  R-squared                           0.2336
   Country FE                             Yes
   Industry FE                            Yes
   Year FE                                Yes
@@ -97,11 +162,53 @@
 ================================================================================
 
 
+======================================================================
+  LEVERAGE CROSS-COUNTRY ANALYSIS
+======================================================================
+
+  Leverage by country (top 15 by median, ≥100 obs):
+  Country    Median     Mean      Std        N
+  ----------------------------------------
+  TUN         0.722    0.654    0.251      603
+  PRT         0.722    0.686    0.216      700
+  ITA         0.660    0.640    0.212    5,060
+  ESP         0.627    0.597    0.245    3,073
+  MAR         0.624    0.632    0.215      777
+  AUT         0.607    0.595    0.235    1,300
+  NOR         0.606    0.573    0.254    3,693
+  KEN         0.604    0.580    0.255      860
+  GRC         0.603    0.582    0.232    3,026
+  NGA         0.602    0.591    0.230    2,104
+  HUN         0.598    0.573    0.247      236
+  ARG         0.597    0.587    0.217    1,173
+  FRA         0.593    0.575    0.213   10,722
+  BRA         0.587    0.555    0.255    5,236
+  DNK         0.574    0.558    0.255    2,809
+
+  Bottom 5 by median leverage:
+  VGB         0.320    0.348    0.263    1,278
+  IMN         0.319    0.380    0.314      314
+  AUS         0.254    0.308    0.258   29,227
+  ROU         0.242    0.300    0.239    2,795
+  GGY         0.218    0.268    0.260    1,170
+
+  Cross-country dispersion: std=0.095, range=0.504
+
+  Year-by-year regressions for log_pe...
+  Extracted 1,401 country-year effects across 37 years
+
   Year-by-year regressions for log_mb...
   Extracted 1,404 country-year effects across 37 years
 
   Year-by-year regressions for roa...
   Extracted 1,446 country-year effects across 39 years
+
+  Variance decomposition for log_pe...
+  R² decomposition for log_pe:
+    Country      0.0758 (64.6%)
+    Industry     0.0284 (24.3%)
+    Year         0.0130 (11.1%)
+    Total R²:  0.1172
 
   Variance decomposition for log_mb...
   R² decomposition for log_mb:
@@ -118,72 +225,134 @@
     Total R²:  0.1305
 
 ======================================================================
-  INDUSTRY × COUNTRY INTERACTION
+  INDUSTRY × COUNTRY INTERACTION (P/E)
 ======================================================================
 
   R² comparison (additive vs country×sector interaction):
-    Additive (C + Ind + Year) R²:       ~0.18
-    Country×Sector + Ind + Year R²:     0.2078
-    R² gain from interaction:           +0.0278
+    Country×Sector + Ind + Year R²:     0.1571
 
-  Country effects by GICS sector (5 key countries, pooled across years):
+  Country effects on P/E by GICS sector (10 key countries):
 
 sector_name  Comm Svc  Cons Disc  Cons Staples  Energy  Financials  Health Care  Industrials  Info Tech  Materials  Real Estate  Utilities
 country                                                                                                                                   
-CHN             0.399      0.224         0.214   0.319      -0.013        0.300        0.185      0.282      0.362        0.163      0.009
-DEU             0.074     -0.194        -0.444  -0.503       0.076       -0.067       -0.298     -0.253     -0.001       -0.383      0.088
-GBR            -0.048     -0.280        -0.061  -0.723       0.069       -0.051       -0.220     -0.207     -0.440       -0.606     -0.025
-IND            -0.479     -0.509        -0.576   0.015      -0.260       -0.309       -0.440     -0.709     -0.414       -0.576     -0.252
-JPN            -0.082     -0.551        -0.824  -0.405      -0.404       -0.375       -0.751     -0.580     -0.739       -0.167     -0.317
+AUS            -0.339     -0.317        -0.241  -0.153      -0.164       -0.239       -0.397     -0.432     -0.331       -1.102     -0.061
+BRA            -0.286     -0.248        -0.160  -0.083      -0.713       -0.151       -0.454     -0.271     -0.793       -1.206     -0.553
+CAN            -0.046      0.056         0.345   0.310       0.079       -0.033        0.157      0.092      0.437       -0.204      0.031
+CHN             0.666      0.746         0.847   0.870       0.121        0.417        0.691      0.695      0.932       -0.111      0.436
+DEU            -0.111     -0.050         0.003   0.314       0.021       -0.139       -0.218     -0.317      0.086       -0.878      0.060
+FRA            -0.196     -0.103         0.038  -0.042      -0.557       -0.087       -0.131     -0.453     -0.206       -1.048      0.171
+GBR            -0.145     -0.192         0.029  -0.157      -0.227       -0.053       -0.303     -0.274     -0.016       -1.107     -0.256
+IND             0.200      0.138         0.029   0.332       0.312       -0.207        0.046     -0.226     -0.153       -0.346      0.243
+JPN            -0.032      0.101         0.169   0.307       0.200       -0.140       -0.128     -0.288      0.038       -0.524      0.187
+KOR             0.065      0.078         0.198   0.379       0.030        0.168        0.151     -0.267      0.260       -0.563     -0.079
 
   Cross-sector dispersion of country effects (std dev):
-    JPN    std=0.241  range=[-0.824, -0.082]
-    CHN    std=0.133  range=[-0.013, 0.399]
-    GBR    std=0.256  range=[-0.723, 0.069]
-    DEU    std=0.219  range=[-0.503, 0.088]
-    IND    std=0.200  range=[-0.709, 0.015]
+    JPN    std=0.246  range=[-0.524, 0.307]
+    CHN    std=0.328  range=[-0.111, 0.932]
+    GBR    std=0.305  range=[-1.107, 0.029]
+    DEU    std=0.304  range=[-0.878, 0.314]
+    FRA    std=0.338  range=[-1.048, 0.171]
+    IND    std=0.235  range=[-0.346, 0.332]
+    KOR    std=0.263  range=[-0.563, 0.379]
+    AUS    std=0.275  range=[-1.102, -0.061]
+    BRA    std=0.343  range=[-1.206, -0.083]
+    CAN    std=0.189  range=[-0.204, 0.437]
+
+======================================================================
+  INDUSTRY × COUNTRY INTERACTION (M/B)
+======================================================================
+
+  R² comparison (additive vs country×sector interaction):
+    Country×Sector + Ind + Year R²:     0.2337
+
+  Country effects on M/B by GICS sector (10 key countries):
+
+sector_name  Comm Svc  Cons Disc  Cons Staples  Energy  Financials  Health Care  Industrials  Info Tech  Materials  Real Estate  Utilities
+country                                                                                                                                   
+AUS             0.033     -0.186        -0.521  -0.292       0.172       -0.087       -0.405     -0.112     -0.317       -0.504     -0.197
+BRA            -0.348     -0.470        -0.461  -0.190      -0.269       -0.293       -0.492     -0.351     -0.807       -0.397     -0.190
+CAN            -0.049      0.142        -0.144   0.027       0.315        0.012        0.056      0.008      0.017        0.408     -0.085
+CHN             0.669      0.336         0.327   0.429       0.111        0.316        0.257      0.358      0.440        0.168      0.161
+DEU            -0.014     -0.233        -0.472  -0.484       0.120       -0.228       -0.347     -0.348     -0.020       -0.443      0.091
+FRA            -0.299     -0.487        -0.559  -0.485      -0.511       -0.142       -0.376     -0.635     -0.491       -0.724      0.056
+GBR            -0.043     -0.283        -0.067  -0.609       0.161       -0.134       -0.267     -0.253     -0.350       -0.512     -0.010
+IND            -0.246     -0.439        -0.520   0.179      -0.094       -0.365       -0.378     -0.652     -0.377       -0.478      0.033
+JPN             0.201     -0.475        -0.766  -0.298      -0.254       -0.199       -0.625     -0.501     -0.569       -0.048     -0.073
+KOR             0.263     -0.478        -0.677   0.219      -0.001        0.203       -0.315     -0.418     -0.218       -0.188     -0.462
+
+  Cross-sector dispersion of country effects (std dev):
+    JPN    std=0.289  range=[-0.766, 0.201]
+    CHN    std=0.157  range=[0.111, 0.669]
+    GBR    std=0.226  range=[-0.609, 0.161]
+    DEU    std=0.226  range=[-0.484, 0.120]
+    FRA    std=0.224  range=[-0.724, 0.056]
+    IND    std=0.250  range=[-0.652, 0.179]
+    KOR    std=0.320  range=[-0.677, 0.263]
+    AUS    std=0.216  range=[-0.521, 0.172]
+    BRA    std=0.174  range=[-0.807, -0.190]
+    CAN    std=0.166  range=[-0.144, 0.408]
 
 ======================================================================
   FIGURES
 ======================================================================
+  Saved: country_effects_pe.pdf/png
   Saved: country_effects_mb.pdf/png
   Saved: country_effects_roa.pdf/png
   Saved: dispersion_over_time.pdf/png
   Saved: variance_decomposition.pdf/png
   Saved: industry_country_heatmap.pdf/png
+  Saved: industry_country_heatmap_mb.pdf/png
 
 ======================================================================
   STYLIZED FACTS
 ======================================================================
 
-  1. Country Premium Persistence (M/B)
+  1a. Country Premium Persistence (P/E)
      Lowest 5 (valuation discount vs USA):
-       LTU    -1.762
-       CYP    -1.304
-       MHL    -1.257
-       SRB    -1.201
-       ROU    -1.116
+       LTU    -1.569
+       CYP    -0.872
+       MHL    -0.830
+       PER    -0.739
+       OMN    -0.732
      Highest 5 (valuation premium vs USA):
-       CHN    +0.260
-       IDN    +0.272
-       JAM    +0.309
-       HUN    +0.551
-       CHL    +0.658
+       SAU    +0.253
+       HUN    +0.410
+       CHN    +0.712
+       IDN    +0.769
+       CHL    +0.957
+
+  1b. Country Premium Persistence (M/B)
+     Lowest 5 (valuation discount vs USA):
+       LTU    -1.735
+       CYP    -1.288
+       MHL    -1.222
+       SVN    -1.094
+       ROU    -0.967
+     Highest 5 (valuation premium vs USA):
+       CHN    +0.365
+       JAM    +0.488
+       IDN    +0.524
+       HUN    +0.660
+       CHL    +0.825
 
   2. Cross-Country Dispersion Trend
-     Early years avg dispersion: 0.444
-     Late years avg dispersion:  0.441
-     Trend: CONVERGING
+     P/E: Early=0.167, Late=0.461 → DIVERGING
+     M/B: Early=0.398, Late=0.449 → DIVERGING
 
-  3. Country M/B vs ROA Correlation
-     Correlation between avg country M/B and ROA effects: -0.262
-     Negative relationship
+  3. Country Effect Correlations
+     P/E vs M/B:  +0.848
+     P/E vs ROA:  -0.379
+     M/B vs ROA:  -0.363
 
   4. Variance Decomposition
+     P/E: Country explains the most (64.6% of R²)
      M/B: Country explains the most (51.6% of R²)
      ROA: Country explains the most (50.9% of R²)
 
   5. Japan Discount
-     Japan avg M/B effect: -0.505
-     Japan latest year: -0.569
+     Japan avg P/E effect: +0.006
+     Japan latest year (P/E): -0.284
+     Negative in 57% of years
+     Japan avg M/B effect: -0.364
+     Japan latest year (M/B): -0.335
      Negative in 100% of years

@@ -1,7 +1,7 @@
 """
 02_panel_regressions.py -- Cross-country valuation panel regressions.
 
-Purpose: Construct firm-year panel with market-to-book and ROA,
+Purpose: Construct firm-year panel with P/E, M/B, and ROA,
          run cross-country regressions with country/industry/year
          fixed effects, extract country coefficient evolution,
          and perform variance decomposition.
@@ -14,10 +14,13 @@ Inputs:
 Outputs:
   - output/regressions/panel_data.parquet
   - output/regressions/regression_results.txt
+  - output/regressions/country_effects_pe.pdf/png
   - output/regressions/country_effects_mb.pdf/png
   - output/regressions/country_effects_roa.pdf/png
   - output/regressions/dispersion_over_time.pdf/png
   - output/regressions/variance_decomposition.pdf/png
+  - output/regressions/industry_country_heatmap.pdf/png
+  - output/regressions/industry_country_heatmap_mb.pdf/png
 
 Author: Augustin Landier, HEC Paris
 """
@@ -272,6 +275,15 @@ def load_us_panel() -> pd.DataFrame:
     df["roa"] = winsorize(df["ib"] / df["at"])
     df["log_at"] = np.log(df["at"])
 
+    # Leverage: fraction of assets financed by non-equity
+    df["leverage"] = winsorize((df["at"] - df["ceq"]) / df["at"])
+
+    # P/E: log(market_cap / earnings) for profitable firms only
+    df["log_pe"] = np.nan
+    pe_mask = df["ib"] > 0
+    pe_raw = df.loc[pe_mask, "market_cap"] / df.loc[pe_mask, "ib"]
+    df.loc[pe_mask, "log_pe"] = np.log(winsorize(pe_raw))
+
     # Lag earnings growth: (ib_{t-1} - ib_{t-2}) / |ib_{t-2}|
     df = df.sort_values(["gvkey", "fyear"])
     ib_lag1 = df.groupby("gvkey")["ib"].shift(1)
@@ -289,12 +301,14 @@ def load_us_panel() -> pd.DataFrame:
     # Keep needed columns
     keep = [
         "gvkey", "fyear", "fic", "ggroup", "market_cap", "ceq", "at", "ib",
-        "log_mb", "roa", "log_at", "lag_earn_growth",
+        "log_mb", "log_pe", "roa", "log_at", "leverage", "lag_earn_growth",
     ]
     df = df[keep].copy()
 
+    n_pe = df["log_pe"].notna().sum()
     rprint(f"  US panel: {len(df):,} obs, {df['gvkey'].nunique():,} firms, "
            f"fyear {df['fyear'].min():.0f}–{df['fyear'].max():.0f}")
+    rprint(f"    P/E available (ib>0): {n_pe:,} ({n_pe/len(df)*100:.0f}%)")
     return df
 
 
@@ -383,6 +397,15 @@ def load_global_panel() -> pd.DataFrame:
     df["roa"] = winsorize(df["ib"] / df["at"])
     df["log_at"] = np.log(df["at"])
 
+    # Leverage
+    df["leverage"] = winsorize((df["at"] - df["ceq"]) / df["at"])
+
+    # P/E: log(market_cap / earnings) for profitable firms only
+    df["log_pe"] = np.nan
+    pe_mask = df["ib"] > 0
+    pe_raw = df.loc[pe_mask, "market_cap"] / df.loc[pe_mask, "ib"]
+    df.loc[pe_mask, "log_pe"] = np.log(winsorize(pe_raw))
+
     # Lag earnings growth
     df = df.sort_values(["gvkey", "fyear"])
     ib_lag1 = df.groupby("gvkey")["ib"].shift(1)
@@ -398,13 +421,15 @@ def load_global_panel() -> pd.DataFrame:
 
     keep = [
         "gvkey", "fyear", "fic", "ggroup", "market_cap", "ceq", "at", "ib",
-        "log_mb", "roa", "log_at", "lag_earn_growth",
+        "log_mb", "log_pe", "roa", "log_at", "leverage", "lag_earn_growth",
     ]
     df = df[keep].copy()
 
+    n_pe = df["log_pe"].notna().sum()
     rprint(f"  Global panel: {len(df):,} obs, {df['gvkey'].nunique():,} firms, "
            f"{df['fic'].nunique()} countries, "
            f"fyear {df['fyear'].min():.0f}–{df['fyear'].max():.0f}")
+    rprint(f"    P/E available (ib>0): {n_pe:,} ({n_pe/len(df)*100:.0f}%)")
     return df
 
 
@@ -498,7 +523,7 @@ def print_summary_statistics(df: pd.DataFrame) -> None:
     rprint(f"  Non-US obs: {(~us_mask).sum():,} ({(~us_mask).mean()*100:.1f}%)")
 
     # Variable summaries
-    stats_vars = ["log_mb", "roa", "log_at", "lag_earn_growth"]
+    stats_vars = ["log_pe", "log_mb", "leverage", "roa", "log_at", "lag_earn_growth"]
     rprint(f"\n  {'Variable':<20s} {'N':>8s} {'Mean':>8s} {'Std':>8s} "
            f"{'P10':>8s} {'Median':>8s} {'P90':>8s}")
     rprint("  " + "-" * 68)
@@ -520,12 +545,114 @@ def print_summary_statistics(df: pd.DataFrame) -> None:
 # ---------------------------------------------------------------------------
 
 
-def run_mb_regressions(df: pd.DataFrame) -> dict:
-    """Run M/B regression specifications.
+def run_pe_regressions(df: pd.DataFrame) -> dict:
+    """Run P/E regression specifications (profitable firms only).
 
-    Spec 1: log_mb ~ roa + log_at + lag_earn_growth + C(fic) + C(ggroup) + C(fyear)
-    Spec 2: log_mb ~ roa + log_at + lag_earn_growth + C(ggroup) + Country×Year FE
-            (via Frisch-Waugh demeaning)
+    Spec 1: log_pe ~ leverage + log_at + lag_earn_growth + C(fic) + C(ggroup) + C(fyear)
+    Spec 2: log_pe ~ leverage + log_at + lag_earn_growth + C(ggroup) + Country×Year FE
+
+    Returns
+    -------
+    dict
+        Spec names to result objects/dicts.
+    """
+    rprint("\n" + "=" * 70)
+    rprint("  P/E REGRESSIONS (profitable firms only)")
+    rprint("=" * 70)
+
+    reg_df = df[["log_pe", "leverage", "log_at", "lag_earn_growth",
+                 "fic", "ggroup", "fyear"]].dropna().copy()
+    reg_df["fic"] = reg_df["fic"].astype(str)
+    reg_df["ggroup"] = reg_df["ggroup"].astype(str)
+    reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
+
+    rprint(f"  Regression sample: {len(reg_df):,} obs (ib > 0)")
+    results = {}
+
+    # --- Spec 1: Separate FE ---
+    rprint("\n  Spec 1: Country + Industry + Year FE...")
+    formula1 = ("log_pe ~ leverage + log_at + lag_earn_growth "
+                "+ C(fic, Treatment(reference='USA')) + C(ggroup) + C(fyear_cat)")
+    m1 = smf.ols(formula1, data=reg_df).fit(
+        cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
+    )
+    results["Spec 1"] = m1
+    m1._fe_labels = ["Country FE", "Industry FE", "Year FE"]
+    rprint(f"    N={int(m1.nobs):,}, R²={m1.rsquared:.4f}")
+    rprint(f"    leverage:         {m1.params['leverage']:.4f} (se={m1.bse['leverage']:.4f})")
+    rprint(f"    log_at:           {m1.params['log_at']:.4f} (se={m1.bse['log_at']:.4f})")
+    rprint(f"    lag_earn_growth:  {m1.params['lag_earn_growth']:.4f} "
+           f"(se={m1.bse['lag_earn_growth']:.4f})")
+
+    # --- Spec 2: Country×Year FE via Frisch-Waugh ---
+    rprint("\n  Spec 2: Country×Year FE (Frisch-Waugh demeaning)...")
+    demean_vars = ["log_pe", "leverage", "log_at", "lag_earn_growth"]
+    cy_group = reg_df["fic"] + "_" + reg_df["fyear_cat"]
+
+    reg_df_dm = reg_df.copy()
+    for v in demean_vars:
+        group_mean = reg_df_dm.groupby(cy_group)[v].transform("mean")
+        reg_df_dm[v] = reg_df_dm[v] - group_mean
+
+    formula2 = "log_pe ~ leverage + log_at + lag_earn_growth + C(ggroup) - 1"
+    m2 = smf.ols(formula2, data=reg_df_dm).fit(
+        cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
+    )
+
+    y_orig = reg_df["log_pe"].values
+    y_hat_cy_mean = reg_df.groupby(cy_group)["log_pe"].transform("mean").values
+    y_hat_full = y_hat_cy_mean + m2.fittedvalues.values
+    ss_res = np.sum((y_orig - y_hat_full) ** 2)
+    ss_tot = np.sum((y_orig - np.mean(y_orig)) ** 2)
+    r2_full = 1.0 - ss_res / ss_tot
+    assert 0 <= r2_full <= 1, f"Frisch-Waugh R² out of bounds: {r2_full:.4f}"
+
+    spec2_result = {
+        "coef_names": ["leverage", "log_at", "lag_earn_growth"],
+        "coefs": {
+            "leverage": m2.params.get("leverage", np.nan),
+            "log_at": m2.params.get("log_at", np.nan),
+            "lag_earn_growth": m2.params.get("lag_earn_growth", np.nan),
+        },
+        "ses": {
+            "leverage": m2.bse.get("leverage", np.nan),
+            "log_at": m2.bse.get("log_at", np.nan),
+            "lag_earn_growth": m2.bse.get("lag_earn_growth", np.nan),
+        },
+        "pvalues": {
+            "leverage": m2.pvalues.get("leverage", 1.0),
+            "log_at": m2.pvalues.get("log_at", 1.0),
+            "lag_earn_growth": m2.pvalues.get("lag_earn_growth", 1.0),
+        },
+        "n": int(m2.nobs),
+        "r2": r2_full,
+        "fe": {
+            "Country FE": False, "Industry FE": True,
+            "Year FE": False, "Country x Year FE": True,
+        },
+    }
+    results["Spec 2"] = spec2_result
+    rprint(f"    N={int(m2.nobs):,}, R²={r2_full:.4f}")
+    rprint(f"    leverage:         {m2.params.get('leverage', np.nan):.4f}")
+    rprint(f"    log_at:           {m2.params.get('log_at', np.nan):.4f}")
+    rprint(f"    lag_earn_growth:  {m2.params.get('lag_earn_growth', np.nan):.4f}")
+
+    table = format_regression_table(results, "log(P/E)")
+    rprint(table)
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# 6b. M/B Pooled Regressions
+# ---------------------------------------------------------------------------
+
+
+def run_mb_regressions(df: pd.DataFrame) -> dict:
+    """Run M/B regression specifications (all firms with ceq > 0).
+
+    Spec 1: log_mb ~ roa + leverage + log_at + lag_earn_growth + C(fic) + C(ggroup) + C(fyear)
+    Spec 2: log_mb ~ roa + leverage + log_at + lag_earn_growth + C(ggroup) + Country×Year FE
 
     Returns
     -------
@@ -536,9 +663,8 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
     rprint("  M/B REGRESSIONS")
     rprint("=" * 70)
 
-    reg_df = df[["log_mb", "roa", "log_at", "lag_earn_growth",
+    reg_df = df[["log_mb", "roa", "leverage", "log_at", "lag_earn_growth",
                  "fic", "ggroup", "fyear"]].dropna().copy()
-    # Ensure categoricals are string for formula API
     reg_df["fic"] = reg_df["fic"].astype(str)
     reg_df["ggroup"] = reg_df["ggroup"].astype(str)
     reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
@@ -548,7 +674,7 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
 
     # --- Spec 1: Separate FE ---
     rprint("\n  Spec 1: Country + Industry + Year FE...")
-    formula1 = ("log_mb ~ roa + log_at + lag_earn_growth "
+    formula1 = ("log_mb ~ roa + leverage + log_at + lag_earn_growth "
                 "+ C(fic, Treatment(reference='USA')) + C(ggroup) + C(fyear_cat)")
     m1 = smf.ols(formula1, data=reg_df).fit(
         cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
@@ -557,13 +683,14 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
     m1._fe_labels = ["Country FE", "Industry FE", "Year FE"]
     rprint(f"    N={int(m1.nobs):,}, R²={m1.rsquared:.4f}")
     rprint(f"    roa:              {m1.params['roa']:.4f} (se={m1.bse['roa']:.4f})")
+    rprint(f"    leverage:         {m1.params['leverage']:.4f} (se={m1.bse['leverage']:.4f})")
     rprint(f"    log_at:           {m1.params['log_at']:.4f} (se={m1.bse['log_at']:.4f})")
     rprint(f"    lag_earn_growth:  {m1.params['lag_earn_growth']:.4f} "
            f"(se={m1.bse['lag_earn_growth']:.4f})")
 
     # --- Spec 2: Country×Year FE via Frisch-Waugh ---
     rprint("\n  Spec 2: Country×Year FE (Frisch-Waugh demeaning)...")
-    demean_vars = ["log_mb", "roa", "log_at", "lag_earn_growth"]
+    demean_vars = ["log_mb", "roa", "leverage", "log_at", "lag_earn_growth"]
     cy_group = reg_df["fic"] + "_" + reg_df["fyear_cat"]
 
     reg_df_dm = reg_df.copy()
@@ -571,17 +698,13 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
         group_mean = reg_df_dm.groupby(cy_group)[v].transform("mean")
         reg_df_dm[v] = reg_df_dm[v] - group_mean
 
-    formula2 = "log_mb ~ roa + log_at + lag_earn_growth + C(ggroup) - 1"
+    formula2 = "log_mb ~ roa + leverage + log_at + lag_earn_growth + C(ggroup) - 1"
     m2 = smf.ols(formula2, data=reg_df_dm).fit(
         cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
     )
 
-    # Compute R² relative to the original (not demeaned) variable
-    # Note: industry dummies in the demeaned regression capture residual
-    # industry effects after removing country×year means.
     y_orig = reg_df["log_mb"].values
     y_hat_cy_mean = reg_df.groupby(cy_group)["log_mb"].transform("mean").values
-    # Full model prediction = country×year mean + within prediction
     y_hat_full = y_hat_cy_mean + m2.fittedvalues.values
     ss_res = np.sum((y_orig - y_hat_full) ** 2)
     ss_tot = np.sum((y_orig - np.mean(y_orig)) ** 2)
@@ -589,19 +712,22 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
     assert 0 <= r2_full <= 1, f"Frisch-Waugh R² out of bounds: {r2_full:.4f}"
 
     spec2_result = {
-        "coef_names": ["roa", "log_at", "lag_earn_growth"],
+        "coef_names": ["roa", "leverage", "log_at", "lag_earn_growth"],
         "coefs": {
             "roa": m2.params.get("roa", np.nan),
+            "leverage": m2.params.get("leverage", np.nan),
             "log_at": m2.params.get("log_at", np.nan),
             "lag_earn_growth": m2.params.get("lag_earn_growth", np.nan),
         },
         "ses": {
             "roa": m2.bse.get("roa", np.nan),
+            "leverage": m2.bse.get("leverage", np.nan),
             "log_at": m2.bse.get("log_at", np.nan),
             "lag_earn_growth": m2.bse.get("lag_earn_growth", np.nan),
         },
         "pvalues": {
             "roa": m2.pvalues.get("roa", 1.0),
+            "leverage": m2.pvalues.get("leverage", 1.0),
             "log_at": m2.pvalues.get("log_at", 1.0),
             "lag_earn_growth": m2.pvalues.get("lag_earn_growth", 1.0),
         },
@@ -615,10 +741,10 @@ def run_mb_regressions(df: pd.DataFrame) -> dict:
     results["Spec 2"] = spec2_result
     rprint(f"    N={int(m2.nobs):,}, R²={r2_full:.4f}")
     rprint(f"    roa:              {m2.params.get('roa', np.nan):.4f}")
+    rprint(f"    leverage:         {m2.params.get('leverage', np.nan):.4f}")
     rprint(f"    log_at:           {m2.params.get('log_at', np.nan):.4f}")
     rprint(f"    lag_earn_growth:  {m2.params.get('lag_earn_growth', np.nan):.4f}")
 
-    # Print formatted table
     table = format_regression_table(results, "log(M/B)")
     rprint(table)
 
@@ -644,7 +770,7 @@ def run_roa_regressions(df: pd.DataFrame) -> dict:
     rprint("  ROA REGRESSIONS")
     rprint("=" * 70)
 
-    reg_df = df[["roa", "log_at", "fic", "ggroup", "fyear"]].dropna().copy()
+    reg_df = df[["roa", "leverage", "log_at", "fic", "ggroup", "fyear"]].dropna().copy()
     reg_df["fic"] = reg_df["fic"].astype(str)
     reg_df["ggroup"] = reg_df["ggroup"].astype(str)
     reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
@@ -653,7 +779,7 @@ def run_roa_regressions(df: pd.DataFrame) -> dict:
     results = {}
 
     rprint("\n  Spec 1: Country + Industry + Year FE...")
-    formula = ("roa ~ log_at "
+    formula = ("roa ~ leverage + log_at "
                "+ C(fic, Treatment(reference='USA')) + C(ggroup) + C(fyear_cat)")
     m1 = smf.ols(formula, data=reg_df).fit(
         cov_type="cluster", cov_kwds={"groups": reg_df["fic"]}
@@ -839,24 +965,35 @@ GICS_SECTOR_MAP = {
 }
 
 
-def explore_industry_country_interaction(df: pd.DataFrame) -> pd.DataFrame:
-    """Test whether country effects on M/B vary across industries.
+def explore_industry_country_interaction(
+    df: pd.DataFrame,
+    dep_var: str = "log_pe",
+    controls: list | None = None,
+) -> pd.DataFrame:
+    """Test whether country effects on a valuation metric vary across industries.
 
-    Approach:
-    1. Run separate regressions per GICS sector, extracting country effects.
-    2. Compare country effects across sectors via a heatmap.
-    3. Report R² gain from adding Country×Industry interaction.
+    Parameters
+    ----------
+    dep_var : str
+        Dependent variable ('log_pe' or 'log_mb').
+    controls : list
+        Control variables for per-sector regressions.
 
     Returns
     -------
     pd.DataFrame
         Country effects by sector (rows=countries, columns=sectors).
     """
+    if controls is None:
+        controls = ["leverage", "log_at"]
+    label = "P/E" if dep_var == "log_pe" else "M/B"
+
     rprint("\n" + "=" * 70)
-    rprint("  INDUSTRY × COUNTRY INTERACTION")
+    rprint(f"  INDUSTRY × COUNTRY INTERACTION ({label})")
     rprint("=" * 70)
 
-    reg_df = df[["log_mb", "roa", "log_at", "fic", "ggroup", "fyear"]].dropna().copy()
+    all_cols = [dep_var] + controls + ["fic", "ggroup", "fyear"]
+    reg_df = df[all_cols].dropna().copy()
     reg_df["fic"] = reg_df["fic"].astype(str)
     reg_df["ggroup"] = reg_df["ggroup"].astype(str)
     reg_df["fyear_cat"] = reg_df["fyear"].astype(str)
@@ -866,39 +1003,37 @@ def explore_industry_country_interaction(df: pd.DataFrame) -> pd.DataFrame:
 
     # --- R² comparison: additive vs interaction (via Frisch-Waugh) ---
     rprint("\n  R² comparison (additive vs country×sector interaction):")
-    # Additive R² from variance decomposition already computed; estimate
-    # interaction R² by demeaning within country×sector groups
     try:
         cs_group = reg_df["fic"] + "_" + reg_df["gsector"].astype(str)
-        dm_vars = ["log_mb", "roa", "log_at"]
+        dm_vars = [dep_var] + controls
         reg_dm = reg_df.copy()
         for v in dm_vars:
             reg_dm[v] = reg_dm[v] - reg_dm.groupby(cs_group)[v].transform("mean")
-        m_dm = smf.ols("log_mb ~ roa + log_at + C(ggroup) + C(fyear_cat) - 1",
+        ctrl_str = " + ".join(controls)
+        m_dm = smf.ols(f"{dep_var} ~ {ctrl_str} + C(ggroup) + C(fyear_cat) - 1",
                        data=reg_dm).fit()
-        y_orig = reg_df["log_mb"].values
-        y_cs_mean = reg_df.groupby(cs_group)["log_mb"].transform("mean").values
+        y_orig = reg_df[dep_var].values
+        y_cs_mean = reg_df.groupby(cs_group)[dep_var].transform("mean").values
         y_hat = y_cs_mean + m_dm.fittedvalues.values
         ss_res = np.sum((y_orig - y_hat) ** 2)
         ss_tot = np.sum((y_orig - y_orig.mean()) ** 2)
         r2_int = 1.0 - ss_res / ss_tot
-        rprint(f"    Additive (C + Ind + Year) R²:       ~0.18")
         rprint(f"    Country×Sector + Ind + Year R²:     {r2_int:.4f}")
-        rprint(f"    R² gain from interaction:           {r2_int - 0.18:+.4f}")
     except (np.linalg.LinAlgError, ValueError) as e:
         rprint(f"    WARNING: R² comparison failed: {e}")
 
     # --- Per-sector regressions for key countries ---
-    rprint("\n  Country effects by GICS sector (5 key countries, pooled across years):")
-    key_countries = ["JPN", "CHN", "GBR", "DEU", "IND"]
+    rprint(f"\n  Country effects on {label} by GICS sector (10 key countries):")
+    key_countries = ["JPN", "CHN", "GBR", "DEU", "FRA", "IND", "KOR", "AUS", "BRA", "CAN"]
     sectors = sorted(reg_df["gsector"].unique())
     records = []
 
+    ctrl_str = " + ".join(controls)
     for sec in sectors:
         sec_df = reg_df[reg_df["gsector"] == sec]
         if len(sec_df) < 500 or "USA" not in sec_df["fic"].values:
             continue
-        formula = ("log_mb ~ roa + log_at "
+        formula = (f"{dep_var} ~ {ctrl_str} "
                    "+ C(fic, Treatment(reference='USA')) + C(fyear_cat)")
         try:
             m = smf.ols(formula, data=sec_df).fit(cov_type="HC1")
@@ -937,7 +1072,10 @@ def explore_industry_country_interaction(df: pd.DataFrame) -> pd.DataFrame:
     return sector_effects
 
 
-def plot_industry_country_heatmap(sector_effects: pd.DataFrame) -> None:
+def plot_industry_country_heatmap(
+    sector_effects: pd.DataFrame,
+    dep_label: str = "pe",
+) -> None:
     """Plot heatmap of country effects by GICS sector."""
     if sector_effects.empty:
         return
@@ -948,6 +1086,7 @@ def plot_industry_country_heatmap(sector_effects: pd.DataFrame) -> None:
     if pivot.empty:
         return
 
+    title_map = {"pe": "log(P/E)", "mb": "log(M/B)"}
     fig, ax = plt.subplots(figsize=(10, 4))
     im = ax.imshow(pivot.values, cmap="RdBu_r", aspect="auto",
                    vmin=-0.8, vmax=0.8)
@@ -955,7 +1094,8 @@ def plot_industry_country_heatmap(sector_effects: pd.DataFrame) -> None:
     ax.set_xticklabels(pivot.columns, rotation=45, ha="right", fontsize=8)
     ax.set_yticks(range(len(pivot.index)))
     ax.set_yticklabels(pivot.index, fontsize=10)
-    ax.set_title("Country Effects on log(M/B) by GICS Sector (vs USA)")
+    ax.set_title(f"Country Effects on {title_map.get(dep_label, dep_label)} "
+                 f"by GICS Sector (vs USA)")
     fig.colorbar(im, ax=ax, shrink=0.8, label="Effect")
 
     # Annotate cells
@@ -966,7 +1106,8 @@ def plot_industry_country_heatmap(sector_effects: pd.DataFrame) -> None:
                 ax.text(j, i, f"{val:.2f}", ha="center", va="center",
                         fontsize=7, color="white" if abs(val) > 0.4 else "black")
 
-    save_figure(fig, "industry_country_heatmap")
+    suffix = f"_{dep_label}" if dep_label != "pe" else ""
+    save_figure(fig, f"industry_country_heatmap{suffix}")
 
 
 # ---------------------------------------------------------------------------
@@ -984,7 +1125,7 @@ def plot_country_effects(effects_df: pd.DataFrame, dep_label: str) -> None:
     dep_label : str
         'mb' or 'roa'.
     """
-    title_map = {"mb": "log(M/B)", "roa": "ROA"}
+    title_map = {"pe": "log(P/E)", "mb": "log(M/B)", "roa": "ROA"}
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # Project-consistent muted palette for 10 countries
@@ -1010,12 +1151,17 @@ def plot_country_effects(effects_df: pd.DataFrame, dep_label: str) -> None:
     save_figure(fig, f"country_effects_{dep_label}")
 
 
-def plot_dispersion(effects_mb: pd.DataFrame, effects_roa: pd.DataFrame) -> None:
+def plot_dispersion(
+    effects_pe: pd.DataFrame,
+    effects_mb: pd.DataFrame,
+    effects_roa: pd.DataFrame,
+) -> None:
     """Plot cross-country dispersion (std dev of country effects) over time."""
     fig, ax = plt.subplots()
 
     for effects_df, label, color in [
-        (effects_mb, "log(M/B)", PALETTE["accent"]),
+        (effects_pe, "log(P/E)", PALETTE["accent"]),
+        (effects_mb, "log(M/B)", PALETTE["highlight"]),
         (effects_roa, "ROA", PALETTE["primary"]),
     ]:
         disp = (
@@ -1033,18 +1179,20 @@ def plot_dispersion(effects_mb: pd.DataFrame, effects_roa: pd.DataFrame) -> None
     save_figure(fig, "dispersion_over_time")
 
 
-def plot_variance_decomposition(decomp_mb: dict, decomp_roa: dict) -> None:
+def plot_variance_decomposition(
+    decomp_pe: dict, decomp_mb: dict, decomp_roa: dict
+) -> None:
     """Stacked bar chart of R² decomposition."""
     fig, ax = plt.subplots()
 
     factors = ["Country", "Industry", "Year"]
     colors = [PALETTE["primary"], PALETTE["secondary"], PALETTE["accent"]]
 
-    x = [0, 1]
-    labels = ["log(M/B)", "ROA"]
+    x = [0, 1, 2]
+    labels = ["log(P/E)", "log(M/B)", "ROA"]
     width = 0.5
 
-    for decomp, xi in [(decomp_mb, 0), (decomp_roa, 1)]:
+    for decomp, xi in [(decomp_pe, 0), (decomp_mb, 1), (decomp_roa, 2)]:
         bottom = 0
         for factor, color in zip(factors, colors):
             val = decomp[factor]
@@ -1067,8 +1215,10 @@ def plot_variance_decomposition(decomp_mb: dict, decomp_roa: dict) -> None:
 
 
 def print_stylized_facts(
+    effects_pe: pd.DataFrame,
     effects_mb: pd.DataFrame,
     effects_roa: pd.DataFrame,
+    decomp_pe: dict,
     decomp_mb: dict,
     decomp_roa: dict,
 ) -> None:
@@ -1077,65 +1227,68 @@ def print_stylized_facts(
     rprint("  STYLIZED FACTS")
     rprint("=" * 70)
 
-    # 1. Country premium persistence
-    rprint("\n  1. Country Premium Persistence (M/B)")
-    avg_effects = (
-        effects_mb[effects_mb["fic"] != "USA"]
-        .groupby("fic")["country_effect"]
-        .mean()
-        .sort_values()
-    )
-    rprint("     Lowest 5 (valuation discount vs USA):")
-    for country, val in avg_effects.head(5).items():
-        rprint(f"       {country:<6s} {val:+.3f}")
-    rprint("     Highest 5 (valuation premium vs USA):")
-    for country, val in avg_effects.tail(5).items():
-        rprint(f"       {country:<6s} {val:+.3f}")
+    # 1. Country premium persistence (both P/E and M/B)
+    for idx, (label, effects) in enumerate([("P/E", effects_pe), ("M/B", effects_mb)]):
+        sub = "a" if idx == 0 else "b"
+        rprint(f"\n  1{sub}. Country Premium Persistence ({label})")
+        avg_effects = (
+            effects[effects["fic"] != "USA"]
+            .groupby("fic")["country_effect"]
+            .mean()
+            .sort_values()
+        )
+        rprint(f"     Lowest 5 (valuation discount vs USA):")
+        for country, val in avg_effects.head(5).items():
+            rprint(f"       {country:<6s} {val:+.3f}")
+        rprint(f"     Highest 5 (valuation premium vs USA):")
+        for country, val in avg_effects.tail(5).items():
+            rprint(f"       {country:<6s} {val:+.3f}")
 
     # 2. Convergence/divergence
     rprint("\n  2. Cross-Country Dispersion Trend")
-    disp = (
-        effects_mb[effects_mb["fic"] != "USA"]
-        .groupby("fyear")["country_effect"]
-        .std()
-    )
-    if len(disp) >= 5:
-        early = disp.head(3).mean()
-        late = disp.tail(3).mean()
-        trend = "CONVERGING" if late < early else "DIVERGING"
-        rprint(f"     Early years avg dispersion: {early:.3f}")
-        rprint(f"     Late years avg dispersion:  {late:.3f}")
-        rprint(f"     Trend: {trend}")
+    for label, effects in [("P/E", effects_pe), ("M/B", effects_mb)]:
+        disp = (
+            effects[effects["fic"] != "USA"]
+            .groupby("fyear")["country_effect"]
+            .std()
+        )
+        if len(disp) >= 5:
+            early = disp.head(3).mean()
+            late = disp.tail(3).mean()
+            trend = "CONVERGING" if late < early else "DIVERGING"
+            rprint(f"     {label}: Early={early:.3f}, Late={late:.3f} → {trend}")
 
-    # 3. Correlation M/B and ROA country effects
-    rprint("\n  3. Country M/B vs ROA Correlation")
+    # 3. Correlations between P/E, M/B, and ROA country effects
+    rprint("\n  3. Country Effect Correlations")
+    avg_pe = effects_pe.groupby("fic")["country_effect"].mean()
     avg_mb = effects_mb.groupby("fic")["country_effect"].mean()
     avg_roa = effects_roa.groupby("fic")["country_effect"].mean()
-    common = avg_mb.index.intersection(avg_roa.index)
+    common = avg_pe.index.intersection(avg_mb.index).intersection(avg_roa.index)
     if len(common) > 5:
-        corr = avg_mb[common].corr(avg_roa[common])
-        rprint(f"     Correlation between avg country M/B and ROA effects: {corr:.3f}")
-        rprint(f"     {'Strong positive' if corr > 0.5 else 'Weak' if corr > 0 else 'Negative'} "
-               f"relationship")
+        corr_pe_mb = avg_pe[common].corr(avg_mb[common])
+        corr_pe_roa = avg_pe[common].corr(avg_roa[common])
+        corr_mb_roa = avg_mb[common].corr(avg_roa[common])
+        rprint(f"     P/E vs M/B:  {corr_pe_mb:+.3f}")
+        rprint(f"     P/E vs ROA:  {corr_pe_roa:+.3f}")
+        rprint(f"     M/B vs ROA:  {corr_mb_roa:+.3f}")
 
     # 4. Variance decomposition
     rprint("\n  4. Variance Decomposition")
-    total_mb = sum(decomp_mb.values())
-    total_roa = sum(decomp_roa.values())
-    for label, decomp, total in [("M/B", decomp_mb, total_mb),
-                                  ("ROA", decomp_roa, total_roa)]:
+    for label, decomp in [("P/E", decomp_pe), ("M/B", decomp_mb), ("ROA", decomp_roa)]:
+        total = sum(decomp.values())
         dominant = max(decomp, key=decomp.get)
         rprint(f"     {label}: {dominant} explains the most "
                f"({decomp[dominant]/total*100:.1f}% of R²)")
 
-    # 5. Japan discount
+    # 5. Japan discount (both metrics)
     rprint("\n  5. Japan Discount")
-    jpn = effects_mb[effects_mb["fic"] == "JPN"].sort_values("fyear")
-    if len(jpn) > 0:
-        rprint(f"     Japan avg M/B effect: {jpn['country_effect'].mean():+.3f}")
-        rprint(f"     Japan latest year: {jpn['country_effect'].iloc[-1]:+.3f}")
-        persistent = (jpn["country_effect"] < 0).mean()
-        rprint(f"     Negative in {persistent*100:.0f}% of years")
+    for label, effects in [("P/E", effects_pe), ("M/B", effects_mb)]:
+        jpn = effects[effects["fic"] == "JPN"].sort_values("fyear")
+        if len(jpn) > 0:
+            rprint(f"     Japan avg {label} effect: {jpn['country_effect'].mean():+.3f}")
+            rprint(f"     Japan latest year ({label}): {jpn['country_effect'].iloc[-1]:+.3f}")
+            persistent = (jpn["country_effect"] < 0).mean()
+            rprint(f"     Negative in {persistent*100:.0f}% of years")
 
 
 def main() -> None:
@@ -1161,43 +1314,87 @@ def main() -> None:
     # --- Summary Statistics ---
     print_summary_statistics(df)
 
+    # --- P/E Regressions ---
+    pe_results = run_pe_regressions(df)
+
     # --- M/B Regressions ---
     mb_results = run_mb_regressions(df)
 
     # --- ROA Regressions ---
     roa_results = run_roa_regressions(df)
 
+    # --- Leverage Cross-Country Analysis ---
+    rprint("\n" + "=" * 70)
+    rprint("  LEVERAGE CROSS-COUNTRY ANALYSIS")
+    rprint("=" * 70)
+    lev_by_country = (
+        df.groupby("fic", observed=True)["leverage"]
+        .agg(["median", "mean", "std", "count"])
+        .sort_values("median", ascending=False)
+    )
+    lev_by_country = lev_by_country[lev_by_country["count"] >= 100]
+    rprint(f"\n  Leverage by country (top 15 by median, ≥100 obs):")
+    rprint(f"  {'Country':<8s} {'Median':>8s} {'Mean':>8s} {'Std':>8s} {'N':>8s}")
+    rprint("  " + "-" * 40)
+    for fic, row in lev_by_country.head(15).iterrows():
+        rprint(f"  {fic:<8s} {row['median']:>8.3f} {row['mean']:>8.3f} "
+               f"{row['std']:>8.3f} {int(row['count']):>8,}")
+    rprint(f"\n  Bottom 5 by median leverage:")
+    for fic, row in lev_by_country.tail(5).iterrows():
+        rprint(f"  {fic:<8s} {row['median']:>8.3f} {row['mean']:>8.3f} "
+               f"{row['std']:>8.3f} {int(row['count']):>8,}")
+    overall_std = lev_by_country["median"].std()
+    overall_range = lev_by_country["median"].max() - lev_by_country["median"].min()
+    rprint(f"\n  Cross-country dispersion: std={overall_std:.3f}, "
+           f"range={overall_range:.3f}")
+
     # --- Year-by-Year Regressions ---
+    effects_pe = run_yearly_regressions(
+        df, dep_var="log_pe",
+        controls=["leverage", "log_at", "lag_earn_growth"],
+        label="pe",
+    )
     effects_mb = run_yearly_regressions(
         df, dep_var="log_mb",
-        controls=["roa", "log_at", "lag_earn_growth"],
+        controls=["leverage", "log_at", "lag_earn_growth"],
         label="mb",
     )
     effects_roa = run_yearly_regressions(
         df, dep_var="roa",
-        controls=["log_at"],
+        controls=["leverage", "log_at"],
         label="roa",
     )
 
     # --- Variance Decomposition ---
+    decomp_pe = variance_decomposition(df, "log_pe")
     decomp_mb = variance_decomposition(df, "log_mb")
     decomp_roa = variance_decomposition(df, "roa")
 
     # --- Industry × Country Interaction ---
-    sector_effects = explore_industry_country_interaction(df)
+    sector_effects_pe = explore_industry_country_interaction(
+        df, dep_var="log_pe", controls=["leverage", "log_at"],
+    )
+    sector_effects_mb = explore_industry_country_interaction(
+        df, dep_var="log_mb", controls=["leverage", "log_at"],
+    )
 
     # --- Figures ---
     rprint("\n" + "=" * 70)
     rprint("  FIGURES")
     rprint("=" * 70)
+    plot_country_effects(effects_pe, "pe")
     plot_country_effects(effects_mb, "mb")
     plot_country_effects(effects_roa, "roa")
-    plot_dispersion(effects_mb, effects_roa)
-    plot_variance_decomposition(decomp_mb, decomp_roa)
-    plot_industry_country_heatmap(sector_effects)
+    plot_dispersion(effects_pe, effects_mb, effects_roa)
+    plot_variance_decomposition(decomp_pe, decomp_mb, decomp_roa)
+    plot_industry_country_heatmap(sector_effects_pe, "pe")
+    plot_industry_country_heatmap(sector_effects_mb, "mb")
 
     # --- Stylized Facts ---
-    print_stylized_facts(effects_mb, effects_roa, decomp_mb, decomp_roa)
+    print_stylized_facts(
+        effects_pe, effects_mb, effects_roa,
+        decomp_pe, decomp_mb, decomp_roa,
+    )
 
     # --- Save report ---
     report_path = OUT_DIR / "regression_results.txt"
@@ -1205,6 +1402,7 @@ def main() -> None:
     print(f"\n  Report saved to: {report_path}")
 
     # Save country effects for later use
+    effects_pe.to_parquet(OUT_DIR / "country_effects_pe.parquet", index=False)
     effects_mb.to_parquet(OUT_DIR / "country_effects_mb.parquet", index=False)
     effects_roa.to_parquet(OUT_DIR / "country_effects_roa.parquet", index=False)
     print("  Done.")

@@ -1,4 +1,4 @@
-Regional M/B and ROA Summary
+Regional Valuation and ROA Summary (P/E + M/B)
 ======================================================================
 
   US:
@@ -6,70 +6,87 @@ Regional M/B and ROA Summary
     Countries: 1
     Firms: 19,245
     Years: 1986–2024
-    Median log(M/B): 0.610
-    Mean log(M/B):   0.713
+    Median log(P/E): 2.848 (N=127,006)
+    VW Mean log(P/E): 3.186
+    Median log(M/B): 0.610 (N=188,364)
     VW Mean log(M/B): 1.465
+    Median leverage: 0.552
     Median ROA:      0.0163
     Mean ROA:        -0.0437
-    Early M/B median: 0.501
-    Late M/B median:  0.699
-    Trend: UP (+0.198)
+    P/E trend: early=2.703, late=2.968 (UP +0.264)
+    M/B trend: early=0.501, late=0.699 (UP +0.198)
 
   Europe:
     Obs: 118,667
     Countries: 31
     Firms: 12,901
     Years: 1987–2024
-    Median log(M/B): 0.333
-    Mean log(M/B):   0.455
+    Median log(P/E): 2.718 (N=79,773)
+    VW Mean log(P/E): 4.048
+    Median log(M/B): 0.333 (N=118,667)
     VW Mean log(M/B): 1.699
+    Median leverage: 0.516
     Median ROA:      0.0206
     Mean ROA:        -0.0183
-    Early M/B median: 0.224
-    Late M/B median:  0.480
-    Trend: UP (+0.255)
+    P/E trend: early=2.612, late=2.796 (UP +0.184)
+    M/B trend: early=0.224, late=0.480 (UP +0.255)
 
   Japan:
     Obs: 60,003
     Countries: 1
     Firms: 4,715
     Years: 2001–2024
-    Median log(M/B): -0.073
-    Mean log(M/B):   0.038
+    Median log(P/E): 2.660 (N=51,114)
+    VW Mean log(P/E): 2.933
+    Median log(M/B): -0.073 (N=60,003)
     VW Mean log(M/B): 0.488
+    Median leverage: 0.506
     Median ROA:      0.0277
     Mean ROA:        0.0209
-    Early M/B median: -0.188
-    Late M/B median:  0.022
-    Trend: UP (+0.210)
+    P/E trend: early=2.729, late=2.598 (DOWN -0.131)
+    M/B trend: early=-0.188, late=0.022 (UP +0.210)
 
   China:
     Obs: 58,295
     Countries: 1
     Firms: 5,599
     Years: 2007–2024
-    Median log(M/B): 0.995
-    Mean log(M/B):   0.987
+    Median log(P/E): 3.642 (N=50,356)
+    VW Mean log(P/E): 3.290
+    Median log(M/B): 0.995 (N=58,295)
     VW Mean log(M/B): 1.023
+    Median leverage: 0.454
     Median ROA:      0.0316
     Mean ROA:        0.0287
-    Early M/B median: 1.067
-    Late M/B median:  0.841
-    Trend: DOWN (-0.226)
+    P/E trend: early=3.665, late=3.528 (DOWN -0.136)
+    M/B trend: early=1.067, late=0.841 (DOWN -0.226)
 
   Other Asia:
     Obs: 200,317
     Countries: 14
     Firms: 18,411
     Years: 1993–2024
-    Median log(M/B): 0.157
-    Mean log(M/B):   0.231
+    Median log(P/E): 2.697 (N=151,739)
+    VW Mean log(P/E): 3.147
+    Median log(M/B): 0.157 (N=200,317)
     VW Mean log(M/B): 1.066
+    Median leverage: 0.469
     Median ROA:      0.0264
     Mean ROA:        0.0190
-    Early M/B median: 0.042
-    Late M/B median:  0.328
-    Trend: UP (+0.286)
+    P/E trend: early=2.460, late=2.845 (UP +0.384)
+    M/B trend: early=0.042, late=0.328 (UP +0.286)
+
+======================================================================
+P/E Gap: US minus Region (recent 5 years)
+======================================================================
+  US - Europe      : +0.110 log points (~+12% in levels, EW median)
+  US - Europe      : -0.950 log points (~-61% in levels, VW mean)
+  US - Japan       : +0.308 log points (~+36% in levels, EW median)
+  US - Japan       : +0.434 log points (~+54% in levels, VW mean)
+  US - China       : -0.659 log points (~-48% in levels, EW median)
+  US - China       : +0.065 log points (~+7% in levels, VW mean)
+  US - Other Asia  : +0.061 log points (~+6% in levels, EW median)
+  US - Other Asia  : +0.145 log points (~+16% in levels, VW mean)
 
 ======================================================================
 M/B Gap: US minus Region (recent 5 years)
