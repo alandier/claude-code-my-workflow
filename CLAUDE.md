@@ -37,9 +37,12 @@ global-valuation/
 └── master_supporting_docs/      # Papers and existing slides
 ```
 
-**External data (not in repo):** `~/Dropbox/Research_Data/GlobalValuation/`
-- `compustat_global.csv`, `compustat_na.csv`, `crsp_monthly.csv`, `crsp_daily.csv`
-- ~5.5 GB total -- always use `usecols`/`dtype` to limit memory
+**External data (not in repo):** `~/Augustin Landier Dropbox/augustin landier/Valuation_Global/Data_Global/`
+- `compustat_global.csv` (2.3 GB, 981K rows, 468 cols — Global annual fundamentals, `gvkey` lowercase)
+- `compustat_america.csv` (0.8 GB, 254K rows, 984 cols — NA fundamentals + CRSP link, `GVKEY` uppercase, has `mkvalt`/`prcc_f`)
+- `returns_global.csv` (1.9 GB, 10.4M rows, 25 cols — Global monthly prices, no computed returns)
+- `returns_america.csv` (0.9 GB, 3.6M rows, 55 cols — CRSP monthly, `PERMNO`/`RET`/`PRC`/`SHROUT`)
+- ~5.9 GB total -- always use `usecols`/`dtype` to limit memory
 
 ---
 
@@ -111,4 +114,5 @@ To be defined if presentations are created.
 | Component | File | Status | Description |
 |-----------|------|--------|-------------|
 | Paper | `Paper/` | Not started | Cross-country valuation multiples |
+| Data exploration | `scripts/python/01_explore_data.py` | Done | Schema, coverage, missingness, P/B diagnostics |
 | Data pipeline | `scripts/python/` | Not started | Compustat + CRSP processing |

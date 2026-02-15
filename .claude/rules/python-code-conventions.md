@@ -23,7 +23,7 @@ paths:
 ```python
 from pathlib import Path
 
-DATA_DIR = Path("~/Dropbox/Research_Data/GlobalValuation/").expanduser()
+DATA_DIR = Path("~/Augustin Landier Dropbox/augustin landier/Valuation_Global/Data_Global/").expanduser()
 OUT_DIR = Path("output")
 FIG_DIR = Path("Figures")
 ```
