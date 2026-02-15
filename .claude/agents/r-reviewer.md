@@ -58,14 +58,16 @@ Produce a thorough, actionable code review report. You do NOT edit files — you
 **Flag:** Undocumented functions, magic numbers, unnamed return values, code duplication.
 
 ### 5. DOMAIN CORRECTNESS
-<!-- Customize this section for your field -->
-- [ ] Estimator implementations match the formulas shown on slides
-- [ ] Standard errors use the appropriate method
-- [ ] DGP specifications in simulations match the paper being replicated
-- [ ] Treatment effects are the correct estimand (e.g., ATT vs ATE)
+- [ ] Valuation ratio computations match standard definitions (P/E, P/B, EV/EBITDA, Tobin's Q)
+- [ ] Adjusted prices used for return calculations (handle stock splits via `ajex`)
+- [ ] Winsorization applied at 1st/99th percentiles before summary statistics
+- [ ] Negative equity filtered or flagged before computing P/B ratios
+- [ ] Currency consistency checked in cross-country comparisons
+- [ ] Sample filters documented and justified (exclusion of financials, utilities, micro-caps)
+- [ ] Standard errors use the appropriate clustering level (firm, country-year)
 - [ ] Check `.claude/rules/r-code-conventions.md` for known pitfalls
 
-**Flag:** Implementation doesn't match theory, wrong estimand, known bugs.
+**Flag:** Wrong ratio definition, missing winsorization, currency mixing, undocumented sample filters.
 
 ### 6. FIGURE QUALITY
 - [ ] Consistent color palette (check your project's standard colors)

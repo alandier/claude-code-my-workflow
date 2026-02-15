@@ -27,19 +27,23 @@ paths:
 
 ## 3. Domain Correctness
 
-<!-- Customize for your field's known pitfalls -->
-- Verify estimator implementations match slide formulas
+- Verify valuation ratio computations (P/E, P/B, EV/EBITDA, Tobin's Q)
+- Use adjusted prices for return calculations (handle stock splits)
+- Winsorize valuation ratios at 1st/99th percentiles before computing means
+- Filter negative equity before computing P/B ratios
+- Check currency consistency in cross-country comparisons
+- Document and justify all sample filters (exclusion of financials, utilities, etc.)
 - Check known package bugs (document below in Common Pitfalls)
 
 ## 4. Visual Identity
 
 ```r
-# --- Your institutional palette ---
-primary_blue  <- "#012169"
-primary_gold  <- "#f2a900"
-accent_gray   <- "#525252"
-positive_green <- "#15803d"
-negative_red  <- "#b91c1c"
+# --- Project palette (muted blues/grays) ---
+primary_dark  <- "#2c3e50"
+secondary_gray <- "#7f8c8d"
+accent_blue   <- "#2980b9"
+highlight_purple <- "#8e44ad"
+alert_red     <- "#c0392b"
 ```
 
 ### Custom Theme
@@ -47,7 +51,7 @@ negative_red  <- "#b91c1c"
 theme_custom <- function(base_size = 14) {
   theme_minimal(base_size = base_size) +
     theme(
-      plot.title = element_text(face = "bold", color = primary_blue),
+      plot.title = element_text(face = "bold", color = primary_dark),
       legend.position = "bottom"
     )
 }
@@ -68,11 +72,14 @@ saveRDS(result, file.path(out_dir, "descriptive_name.rds"))
 
 ## 6. Common Pitfalls
 
-<!-- Add your field-specific pitfalls here -->
 | Pitfall | Impact | Prevention |
 |---------|--------|------------|
 | Missing `bg = "transparent"` | White boxes on slides | Always include in ggsave() |
 | Hardcoded paths | Breaks on other machines | Use relative paths |
+| Computing mean P/E without winsorizing | Outliers dominate (P/E > 1000) | Winsorize first or use median |
+| Dividing by zero equity | Inf/NaN in P/B ratios | Filter ceq > 0 before division |
+| Mixing fiscal and calendar year | Misaligned financial data | Use fyear for Compustat |
+| Ignoring currency in cross-country data | Apples-to-oranges comparisons | Use ratios or convert currencies |
 
 ## 7. Line Length & Mathematical Exceptions
 

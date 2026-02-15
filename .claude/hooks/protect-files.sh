@@ -22,6 +22,10 @@ fi
 PROTECTED_PATTERNS=(
   "Bibliography_base.bib"
   "settings.json"
+  "compustat_global.csv"
+  "compustat_na.csv"
+  "crsp_monthly.csv"
+  "crsp_daily.csv"
 )
 
 BASENAME=$(basename "$FILE")
