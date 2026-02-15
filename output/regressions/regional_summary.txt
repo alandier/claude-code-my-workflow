@@ -1,0 +1,47 @@
+Regional M/B and ROA Summary
+======================================================================
+
+  US:
+    Obs: 189,411
+    Countries: 1
+    Firms: 19,268
+    Years: 1986–2025
+    Median log(M/B): 0.610
+    Mean log(M/B):   0.714
+    Median ROA:      0.0164
+    Mean ROA:        -0.0435
+    Early M/B median: 0.501
+    Late M/B median:  0.699
+    Trend: UP (+0.198)
+
+  Europe:
+    Obs: 119,385
+    Countries: 31
+    Firms: 12,908
+    Years: 1987–2025
+    Median log(M/B): 0.335
+    Mean log(M/B):   0.457
+    Median ROA:      0.0207
+    Mean ROA:        -0.0183
+    Early M/B median: 0.224
+    Late M/B median:  0.481
+    Trend: UP (+0.257)
+
+  Asia:
+    Obs: 320,606
+    Countries: 16
+    Firms: 28,773
+    Years: 1993–2025
+    Median log(M/B): 0.268
+    Mean log(M/B):   0.332
+    Median ROA:      0.0279
+    Mean ROA:        0.0212
+    Early M/B median: 0.087
+    Late M/B median:  0.431
+    Trend: UP (+0.344)
+
+======================================================================
+M/B Gap: US minus Region (recent 5 years)
+======================================================================
+  US - Europe: +0.212 log points (~+24% in levels)
+  US - Asia: +0.241 log points (~+27% in levels)
