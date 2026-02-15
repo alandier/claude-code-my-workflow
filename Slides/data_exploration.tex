@@ -5,20 +5,22 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{multirow}
 
 % Muted blues/grays palette
 \definecolor{primary}{HTML}{2c3e50}
 \definecolor{accent}{HTML}{2980b9}
 \definecolor{alert}{HTML}{c0392b}
+\definecolor{highlight}{HTML}{8e44ad}
 \setbeamercolor{frametitle}{bg=primary, fg=white}
 \setbeamercolor{progress bar}{fg=accent}
 
-% Figure path
-\graphicspath{{../output/diagnostics/}}
+% Figure paths
+\graphicspath{{../output/diagnostics/}{../output/regressions/}}
 
 % --- Metadata ---
-\title{Global Valuation --- Data Exploration}
-\subtitle{Schema, Coverage, and Preliminary Diagnostics}
+\title{Global Valuation}
+\subtitle{Cross-Country Valuation Multiples: Data and First Results}
 \author{Augustin Landier}
 \institute{HEC Paris}
 \date{February 2026}
@@ -27,9 +29,14 @@
 
 \maketitle
 
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
 % ===================================================================
-\section{Data Overview}
+% PART I: DATA
 % ===================================================================
+\section{Data}
 
 \begin{frame}{Datasets}
 \begin{table}
@@ -49,207 +56,280 @@
 
 \vspace{0.3cm}
 \begin{itemize}
-\item Compustat Global: fiscal years 1987--2025
-\item Compustat America: fiscal years 1986--2025
-\item Returns America: 1986--2024, Returns Global: 2007--2026
+\item Compustat Global: fiscal years 1987--2025, 124 countries
+\item Compustat America: fiscal years 1986--2025, CRSP-linked
+\item Combined regression panel: \textbf{749,527 firm-years}, 72,914 firms, 81 countries
 \end{itemize}
 \end{frame}
 
-% ===================================================================
-\section{Coverage}
-% ===================================================================
-
-\begin{frame}{Top 20 Countries by Firm-Years (Compustat Global)}
-\centering
-\includegraphics[width=0.85\textwidth]{coverage_by_country.pdf}
-\end{frame}
-
-\begin{frame}{Coverage Over Time}
-\centering
-\includegraphics[width=0.85\textwidth]{coverage_by_year.pdf}
-
-\vspace{0.2cm}
-\small Global coverage peaks at $\sim$41K firms (2022); US stable at $\sim$5--8K.
-\end{frame}
-
-% ===================================================================
-\section{Key Variables}
-% ===================================================================
-
-\begin{frame}{Missingness (\% NaN)}
+\begin{frame}{Coverage: Countries and Time}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
-\textbf{Compustat Global}
-\begin{table}
 \centering
-\small
-\begin{tabular}{@{}lr@{}}
-\toprule
-Variable & \% Missing \\
-\midrule
-\texttt{at} (assets)   &  0.3\% \\
-\texttt{ceq} (equity)  &  0.4\% \\
-\texttt{sale}          & 18.3\% \\
-\texttt{ebitda}        &  1.2\% \\
-\texttt{mkvalt}        & \textcolor{alert}{not in file} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\textwidth]{coverage_by_country.pdf}
 \end{column}
 \begin{column}{0.48\textwidth}
-\textbf{Compustat America}
-\begin{table}
 \centering
-\small
-\begin{tabular}{@{}lr@{}}
-\toprule
-Variable & \% Missing \\
-\midrule
-\texttt{at} (assets)   &  8.4\% \\
-\texttt{ceq} (equity)  &  8.5\% \\
-\texttt{sale}          &  8.8\% \\
-\texttt{ebitda}        & 11.4\% \\
-\texttt{prcc\_f}       &  0.4\% \\
-\texttt{csho}          &  0.6\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\textwidth]{coverage_by_year.pdf}
 \end{column}
 \end{columns}
 
-\vspace{0.4cm}
-\small
-\textbf{Note:} \texttt{mkvalt} absent from Global file --- market cap must be computed by merging with \texttt{returns\_global} (price $\times$ shares).
+\vspace{0.1cm}
+\small India, Japan, China dominate non-US coverage. Panel peaks at $\sim$41K firms (2022).
 \end{frame}
 
-% ===================================================================
-\section{Data Quality}
-% ===================================================================
-
-\begin{frame}{Data Quality Flags}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\textbf{Compustat Global}
-\begin{table}
-\centering
-\small
-\begin{tabular}{@{}lr@{}}
-\toprule
-Flag & Count \\
-\midrule
-Zero total assets     &  7,242 \\
-Negative total assets &      4 \\
-Negative equity       & 33,321 \\
-\bottomrule
-\end{tabular}
-\end{table}
-\end{column}
-\begin{column}{0.48\textwidth}
-\textbf{Compustat America}
-\begin{table}
-\centering
-\small
-\begin{tabular}{@{}lr@{}}
-\toprule
-Flag & Count \\
-\midrule
-Zero total assets     &     20 \\
-Negative total assets &      0 \\
-Negative equity       & 10,339 \\
-\bottomrule
-\end{tabular}
-\end{table}
-\end{column}
-\end{columns}
-
-\vspace{0.4cm}
+\begin{frame}{Panel Construction}
 \begin{itemize}
-\item Negative equity: 3.4\% of Global, 4.1\% of US --- must filter for P/B
-\item Zero-asset firms likely shell companies or data errors
+\item \textbf{Market-to-book}: $\log(M/B) = \log(\text{Market Cap} / \text{Book Equity})$
+\begin{itemize}
+\item US: \texttt{mkvalt} from Compustat NA; Global: \texttt{cshoi} $\times$ \texttt{prccm}
 \end{itemize}
+\item \textbf{ROA}: Net Income / Total Assets \quad \textbf{Size}: $\log(\text{Total Assets})$
+\item \textbf{Lag earnings growth}: $(E_{t-1} - E_{t-2}) / |E_{t-2}|$ \quad \textbf{Industry}: SIC-2
+\item Winsorize M/B at 1st/99th percentiles; filter country-years with $\geq 30$ obs
+\end{itemize}
+
+\vspace{0.15cm}
+\begin{table}
+\centering
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Variable & N & Mean & P10 & Median & P90 \\
+\midrule
+$\log(M/B)$ & 749,527 & 0.46 & $-$0.77 & 0.39 & 1.76 \\
+ROA & 749,093 & $-$0.02 & $-$0.15 & 0.02 & 0.11 \\
+$\log(\text{Assets})$ & 749,527 & 7.28 & 3.26 & 7.17 & 11.49 \\
+\bottomrule
+\end{tabular}
+\end{table}
 \end{frame}
 
 % ===================================================================
-\section{Valuation Distributions}
+% PART II: REGRESSIONS
 % ===================================================================
+\section{Cross-Country Regressions}
 
-\begin{frame}{P/B Distributions: Raw vs Winsorized}
+\begin{frame}{Regression Specifications}
+\textbf{Market-to-Book:}
+\begin{align*}
+\log(M/B)_{i,t} &= \alpha + \beta_1 \text{ROA}_{i,t} + \beta_2 \log(\text{Assets})_{i,t} + \beta_3 \Delta E_{i,t-1} \\
+&\quad + \gamma_c + \delta_j + \tau_t + \varepsilon_{i,t} \tag{Spec 1}
+\end{align*}
+\begin{align*}
+\log(M/B)_{i,t} &= \alpha + \beta_1 \text{ROA}_{i,t} + \beta_2 \log(\text{Assets})_{i,t} + \beta_3 \Delta E_{i,t-1} \\
+&\quad + \delta_j + \gamma_{c,t} + \varepsilon_{i,t} \tag{Spec 2}
+\end{align*}
+
+\textbf{ROA:}
+\begin{align*}
+\text{ROA}_{i,t} &= \alpha + \beta_1 \log(\text{Assets})_{i,t} + \gamma_c + \delta_j + \tau_t + \varepsilon_{i,t}
+\end{align*}
+
+\small $\gamma_c$ = country FE, $\delta_j$ = industry FE (SIC-2), $\tau_t$ = year FE, $\gamma_{c,t}$ = country $\times$ year FE.\\
+Standard errors clustered at the country level.
+\end{frame}
+
+\begin{frame}{M/B Regression Results}
+\vspace{-0.3cm}
+\begin{table}
 \centering
-\includegraphics[width=0.82\textwidth]{valuation_distributions.pdf}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+& \textbf{Spec 1} & \textbf{Spec 2} \\
+& C + Ind + Year FE & C$\times$Year + Ind FE \\
+\midrule
+ROA & $-$0.070 & $-$0.102 \\
+    & (0.133) & (0.129) \\[1pt]
+$\log(\text{Assets})$ & $-$0.030 & $-$0.032 \\
+     & (0.024) & (0.024) \\[1pt]
+Lag Earn.\ Growth & 0.006*** & 0.005*** \\
+     & (0.002) & (0.002) \\
+\midrule
+N / $R^2$ & 607,209 / 0.185 & 607,209 / 0.211 \\
+C / Ind / Year FE & Y / Y / Y & -- / Y / -- \\
+C $\times$ Year FE & -- & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+\vspace{-0.1cm}
+\footnotesize *** $p<0.01$. Clustered SEs at country level.
+\end{frame}
+
+\begin{frame}{Key Takeaway: ROA Does Not Explain M/B}
+\begin{itemize}
+\item ROA coefficient is \textbf{insignificant} in both specifications
+\item After country, industry, and year controls, current profitability does not predict M/B
+\item Only \textbf{lag earnings growth} is significant (positive, as expected)
+\item Size effect negative but insignificant with clustered SEs
+\item \textbf{Interpretation}: cross-country M/B differences reflect \emph{discount rates} and \emph{growth expectations}, not current profitability
+\end{itemize}
 
 \vspace{0.2cm}
-\small Global P/B unavailable (no \texttt{mkvalt}). US P/B: heavy right tail tamed by 1/99 winsorization.
+\textbf{$R^2$ comparison:} Spec 1 = 0.185, Spec 2 = 0.211 --- country$\times$year interactions gain 2.6 pp, suggesting time-varying country effects matter.
 \end{frame}
 
 % ===================================================================
-\section{Returns}
+\section{Variance Decomposition}
 % ===================================================================
 
-\begin{frame}{Returns Summary}
+\begin{frame}{What Drives Valuation? Country vs Industry vs Year}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
-\textbf{Returns America (CRSP)}
-\begin{table}
 \centering
-\small
-\begin{tabular}{@{}lr@{}}
-\toprule
-Statistic & Value \\
-\midrule
-Unique securities & 33,074 \\
-Date range        & 1986--2024 \\
-Non-missing \texttt{RET} & 98.5\% \\
-Mean monthly      & 0.91\% \\
-Median monthly    & 0.19\% \\
-Std dev           & 18.3\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=0.9\textwidth]{variance_decomposition.pdf}
 \end{column}
 \begin{column}{0.48\textwidth}
-\textbf{Returns Global}
-\begin{table}
-\centering
+\vspace{0.1cm}
 \small
-\begin{tabular}{@{}lr@{}}
-\toprule
-Statistic & Value \\
-\midrule
-Unique securities & 58,261 \\
-Date range        & 2007--2026 \\
-Return column     & \textcolor{alert}{none} \\
-Price column      & \texttt{prccm} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\textbf{Shapley $R^2$ decomposition:}
 
-\vspace{0.3cm}
-\small Returns must be computed from monthly prices.
+\vspace{0.1cm}
+\textbf{log(M/B):}
+\begin{itemize}\setlength\itemsep{0pt}
+\item Country: \textbf{49.6\%} of $R^2$
+\item Industry: 37.7\%
+\item Year: 12.7\%
+\end{itemize}
+
+\vspace{0.05cm}
+\textbf{ROA:}
+\begin{itemize}\setlength\itemsep{0pt}
+\item Country: \textbf{51.2\%} of $R^2$
+\item Industry: 43.2\%
+\item Year: 5.6\%
+\end{itemize}
+
+\vspace{0.05cm}
+Country dominates both valuation\\ and profitability.
 \end{column}
 \end{columns}
 \end{frame}
 
 % ===================================================================
-\section{Key Takeaways}
+\section{Country Effects Over Time}
 % ===================================================================
 
-\begin{frame}{Pitfalls and Next Steps}
-\textbf{Pitfalls identified:}
-\begin{enumerate}
-\item \texttt{gvkey} is lowercase in Global, \textbf{uppercase} (\texttt{GVKEY}) in America
-\item \texttt{mkvalt} only in America --- Global needs price $\times$ shares merge
-\item Returns Global has \textbf{no return column} --- compute from \texttt{prccm}
-\item 43K negative-equity observations to handle for P/B ratios
-\item Max US monthly return = 3,900\% --- outlier screening needed
-\end{enumerate}
+\begin{frame}{Country Effects on M/B (vs USA)}
+\centering
+\includegraphics[width=0.75\textwidth]{country_effects_mb.pdf}
 
-\vspace{0.4cm}
-\textbf{Next steps:}
+\smallskip
+\scriptsize Year-by-year: $\log(M/B) \sim \text{ROA} + \log(\text{Assets}) + \text{Country FE} + \text{Industry FE}$. USA = 0.
+\end{frame}
+
+\begin{frame}{Country Effects on ROA (vs USA)}
+\centering
+\includegraphics[width=0.75\textwidth]{country_effects_roa.pdf}
+
+\smallskip
+\scriptsize Year-by-year: $\text{ROA} \sim \log(\text{Assets}) + \text{Country FE} + \text{Industry FE}$. USA = 0.
+\end{frame}
+
+\begin{frame}{Cross-Country Dispersion Over Time}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\centering
+\includegraphics[width=\textwidth]{dispersion_over_time.pdf}
+\end{column}
+\begin{column}{0.42\textwidth}
+\vspace{0.3cm}
+\textbf{No convergence in valuations:}
+\begin{itemize}
+\item M/B dispersion: 0.40 $\to$ 0.47
+\item Trend is \textbf{diverging}
+\item Spike during 2008--09 GFC
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{ROA dispersion more stable:}
+\begin{itemize}
+\item Lower level ($\sim$0.05--0.10)
+\item Spike in 2009--10 (earnings collapse)
+\end{itemize}
+
+\vspace{0.15cm}
+\small Valuation gaps are \emph{widening} despite globalization.
+\end{column}
+\end{columns}
+\end{frame}
+
+% ===================================================================
+\section{Stylized Facts}
+% ===================================================================
+
+\begin{frame}{Stylized Facts (1/2): Decomposition}
 \begin{enumerate}
-\item Build cleaning pipeline (filter, winsorize, harmonize identifiers)
-\item Merge Compustat with returns for market-cap-based ratios
-\item Compute country-level valuation multiples (P/B, EV/EBITDA)
+\item \textbf{Country effects dominate valuation} --- country explains 50\% of M/B $R^2$ (Shapley), vs 38\% for industry. Echoes the Heston--Rouwenhorst debate, but for \emph{levels} rather than returns.
+
+\item \textbf{Country dominates profitability too} --- for ROA, country edges industry (51\% vs 43\%). Both valuation and profitability are primarily location-driven.
+
+\item \textbf{Negative M/B--ROA correlation across countries} ($\rho = -0.26$) --- high-M/B countries are \emph{not} high-ROA countries. Discount rates and growth expectations, not current profitability, drive the cross-country valuation map.
 \end{enumerate}
+\end{frame}
+
+\begin{frame}{Stylized Facts (2/2): Dynamics}
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item \textbf{Japan discount is persistent} --- M/B effect negative in \textbf{100\%} of years (avg $-$0.54 vs USA), with no sign of convergence.
+
+\item \textbf{China premium collapsed post-2015} --- from $+0.8$ to near zero, consistent with market correction and deleveraging.
+
+\item \textbf{Cross-country valuation dispersion is increasing} --- despite financial globalization, countries are \emph{diverging} in M/B (std dev: 0.40 $\to$ 0.47).
+\end{enumerate}
+\end{frame}
+
+% ===================================================================
+\section{Literature}
+% ===================================================================
+
+\begin{frame}{Related Literature: Decomposition and Institutions}
+\small
+\textbf{Country vs industry effects:}
+\begin{itemize}
+\item Heston--Rouwenhorst (1994, \textit{JFE}) --- country effects dominate for returns. We find the same for \emph{valuation levels}.
+\item Griffin--Karolyi (1998, \textit{JFE}) --- industry effects matter more in traded-goods sectors.
+\item Brooks--Del Negro (2004) --- country effects declined post-1999 for returns. Opposite for M/B.
+\end{itemize}
+
+\vspace{0.1cm}
+\textbf{Legal origin and investor protection:}
+\begin{itemize}
+\item La Porta et al.\ (2002, \textit{JF}) --- investor protection raises Tobin's Q.
+\item Djankov et al.\ (2008, \textit{JFE}) --- anti-self-dealing index predicts valuations.
+\item Doidge et al.\ (2007, \textit{JFE}) --- countries matter more than firms for governance.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Related Literature: Globalization and Dynamics}
+\small
+\textbf{Limits of convergence:}
+\begin{itemize}
+\item Stulz (2005, \textit{JF}) --- ``twin agency problems'' prevent equalization.
+\item Bekaert et al.\ (2011, \textit{RFS}) --- segmentation decreased but persists.
+\item Doidge et al.\ (2004, \textit{JFE}) --- cross-listed firms gain $\sim$17\% Q premium.
+\end{itemize}
+
+\vspace{0.1cm}
+\textbf{Country-specific puzzles and fundamentals:}
+\begin{itemize}
+\item French--Poterba (1991, \textit{JFE}) --- Japan P/E premium; persistent discount since.
+\item Fama--French (1998, \textit{JF}) --- value premium exists internationally.
+\item Rajan--Zingales (1998, \textit{AER}) --- financial development raises valuations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Our Contribution}
+\begin{itemize}
+\item First panel decomposition of \emph{valuation levels} (not returns) into country, industry, and time using Shapley $R^2$
+
+\item Largest cross-country valuation panel: 81 countries, 1986--2025, 749K firm-years
+
+\item Document \textbf{divergence} in M/B across countries, challenging the globalization-implies-equalization view
+
+\item Country M/B effects \textbf{not} explained by ROA ($\rho = -0.26$) --- points to discount-rate and institutional channels
+\end{itemize}
 \end{frame}
 
 \end{document}

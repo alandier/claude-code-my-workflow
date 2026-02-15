@@ -1,0 +1,184 @@
+======================================================================
+  GLOBAL VALUATION — Panel Regressions
+  Date: 2026-02-15 21:53
+======================================================================
+
+  Loading US panel (compustat_america)...
+  US panel: 220,708 obs, 22,468 firms, fyear 1986–2025
+
+  Loading Global panel (compustat_global + returns_global)...
+  Compustat Global loaded: 980,901 rows
+  Returns Global loaded: 10,374,902 rows
+  After merge: 596,822/980,901 have fiscal year-end price
+  After filters: 550,598 obs (dropped 430,303)
+  Global panel: 550,598 obs, 51,911 firms, 122 countries, fyear 2006–2025
+
+  Building combined panel...
+  Dropped 8,437 duplicate gvkey-fyear rows
+  Filtered to country-years with >= 30 obs: 762,869 → 749,527
+  Panel saved to output/regressions/panel_data.parquet
+
+  Combined panel: 749,527 obs, 72,914 firms, 81 countries, fyear 1986–2025
+
+======================================================================
+  SUMMARY STATISTICS
+======================================================================
+  Total firm-years: 749,527
+  Unique firms: 72,914
+  Countries: 81
+  Year range: 1986–2025
+  US obs: 189,411 (25.3%)
+  Non-US obs: 560,116 (74.7%)
+
+  Variable                    N     Mean      Std      P10   Median      P90
+  --------------------------------------------------------------------
+  log_mb                749,527    0.455    1.047   -0.768    0.385    1.757
+  roa                   749,093   -0.013    0.184   -0.147    0.023    0.109
+  log_at                749,527    7.280    3.184    3.264    7.171   11.490
+  lag_earn_growth       608,384   -0.045    3.805   -1.578    0.072    1.690
+
+  Top 10 countries by obs:
+    USA     189,411
+    JPN      60,542
+    CHN      58,295
+    IND      57,396
+    TWN      30,903
+    AUS      30,475
+    GBR      27,513
+    KOR      25,250
+    CYM      21,477
+    MYS      17,042
+
+======================================================================
+  M/B REGRESSIONS
+======================================================================
+  Regression sample: 607,209 obs
+
+  Spec 1: Country + Industry + Year FE...
+    N=607,209, R²=0.1853
+    roa:              -0.0703 (se=0.1326)
+    log_at:           -0.0295 (se=0.0235)
+    lag_earn_growth:  0.0057 (se=0.0017)
+
+  Spec 2: Country×Year FE (Frisch-Waugh demeaning)...
+    N=607,209, R²=0.2109
+    roa:              -0.1024
+    log_at:           -0.0317
+    lag_earn_growth:  0.0048
+
+================================================================================
+  Dependent variable: log(M/B)
+================================================================================
+  Variable                            Spec 1           Spec 2
+  -----------------------------------------------------------
+  roa                             -0.0703          -0.1024   
+                             (    0.1326)    (    0.1289)  
+  log_at                          -0.0295          -0.0317   
+                             (    0.0235)    (    0.0242)  
+  lag_earn_growth                  0.0057***        0.0048***
+                             (    0.0017)    (    0.0018)  
+  roa                             -0.0703          -0.1024   
+                             (    0.1326)    (    0.1289)  
+  log_at                          -0.0295          -0.0317   
+                             (    0.0235)    (    0.0242)  
+  lag_earn_growth                  0.0057***        0.0048***
+                             (    0.0017)    (    0.0018)  
+  -----------------------------------------------------------
+  N                                  607,209          607,209
+  R-squared                           0.1853           0.2109
+  Country FE                             Yes               No
+  Industry FE                            Yes              Yes
+  Year FE                                Yes               No
+  Country x Year FE                       No              Yes
+================================================================================
+
+
+======================================================================
+  ROA REGRESSIONS
+======================================================================
+  Regression sample: 747,771 obs
+
+  Spec 1: Country + Industry + Year FE...
+    N=747,771, R²=0.1972
+    log_at: 0.0271 (se=0.0051)
+
+================================================================================
+  Dependent variable: ROA
+================================================================================
+  Variable                            Spec 1
+  ------------------------------------------
+  log_at                           0.0271***
+                             (    0.0051)  
+  ------------------------------------------
+  N                                  747,771
+  R-squared                           0.1972
+  Country FE                             Yes
+  Industry FE                            Yes
+  Year FE                                Yes
+  Country x Year FE                       No
+================================================================================
+
+
+  Year-by-year regressions for log_mb...
+  Extracted 1,430 country-year effects across 38 years
+
+  Year-by-year regressions for roa...
+  Extracted 1,472 country-year effects across 40 years
+
+  Variance decomposition for log_mb...
+  R² decomposition for log_mb:
+    Country      0.0901 (49.6%)
+    Industry     0.0685 (37.7%)
+    Year         0.0231 (12.7%)
+    Total R²:  0.1817
+
+  Variance decomposition for roa...
+  R² decomposition for roa:
+    Country      0.0582 (51.2%)
+    Industry     0.0490 (43.2%)
+    Year         0.0064 (5.6%)
+    Total R²:  0.1136
+
+======================================================================
+  FIGURES
+======================================================================
+  Saved: country_effects_mb.pdf/png
+  Saved: country_effects_roa.pdf/png
+  Saved: dispersion_over_time.pdf/png
+  Saved: variance_decomposition.pdf/png
+
+======================================================================
+  STYLIZED FACTS
+======================================================================
+
+  1. Country Premium Persistence (M/B)
+     Lowest 5 (valuation discount vs USA):
+       LTU    -1.709
+       ROU    -1.348
+       SRB    -1.285
+       MHL    -1.281
+       CYP    -1.266
+     Highest 5 (valuation premium vs USA):
+       CHN    +0.235
+       JAM    +0.281
+       IDN    +0.296
+       HUN    +0.580
+       CHL    +0.680
+
+  2. Cross-Country Dispersion Trend
+     Early years avg dispersion: 0.397
+     Late years avg dispersion:  0.467
+     Trend: DIVERGING
+
+  3. Country M/B vs ROA Correlation
+     Correlation between avg country M/B and ROA effects: -0.261
+     Negative relationship
+
+  4. Variance Decomposition
+     M/B: Country explains the most (49.6% of R²)
+     ROA: Country explains the most (51.2% of R²)
+
+  5. Japan Discount
+     Japan avg M/B effect: -0.548
+     Japan latest year: -0.605
+     Negative in 100% of years
