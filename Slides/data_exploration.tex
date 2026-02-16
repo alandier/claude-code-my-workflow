@@ -565,6 +565,72 @@ P/E dispersion nearly tripled ($\times$2.7). M/B dispersion was more stable.
 \end{frame}
 
 % ===================================================================
+\section{Valuation, Profitability, and Growth}
+% ===================================================================
+
+\begin{frame}{High-Valuation Countries Are Not More Profitable}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_roa_vs_pe.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_roa_vs_mb.pdf}
+\end{column}
+\end{columns}
+\vspace{0.1cm}
+\small Each dot is a country (average effect vs USA across years). The negative correlation ($r = -0.41$ for P/E, $r = -0.38$ for M/B) means high-valuation countries tend to have \emph{lower} profitability. Brazil: deeply discounted yet profitable. China: high P/E but average ROA.
+\end{frame}
+
+\begin{frame}{Within Countries, the ROA--Valuation Link Differs by Metric}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_industry_roa_vs_pe.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_industry_roa_vs_mb.pdf}
+\end{column}
+\end{columns}
+\vspace{0.05cm}
+\footnotesize Each dot is a GICS industry group (27 industries, demeaned by country$\times$year).
+\textbf{P/E} ($r = +0.80$): within a country, more profitable industries get higher P/E. Software and Health Equipment at top; Banks and Insurance at bottom.
+\textbf{M/B} ($r = -0.59$): \emph{reverses}. Pharma has lowest ROA but highest M/B (growth options, intangibles). Banks: high ROA, lowest M/B.
+\end{frame}
+
+\begin{frame}{Earnings Growth Does Not Explain Valuations Either}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_eg_vs_pe.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\small
+\vspace{0.1cm}
+\textbf{Cross-country correlations:}
+
+\vspace{0.1cm}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+& \textbf{P/E} & \textbf{M/B} \\
+\midrule
+vs ROA & $-$0.41 & $-$0.38 \\
+vs Earn.\ Growth & $-$0.09 & $+$0.03 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.1cm}
+Earnings growth is \emph{uncorrelated} with valuations. Japan has higher growth than the US yet near-zero P/E premium. Brazil has US-level growth yet a deep discount.
+
+\vspace{0.1cm}
+\textbf{Implication}: the cross-country valuation spread is a \emph{discount rate} phenomenon, not a cash flow story.
+\end{column}
+\end{columns}
+\end{frame}
+
+% ===================================================================
 \section{Stylized Facts and Takeaways}
 % ===================================================================
 
@@ -596,7 +662,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 
 \item \textbf{Country dominates profitability too} --- for ROA, country edges industry (51\% vs 45\%).
 
-\item \textbf{Negative valuation--ROA correlation} ($\rho \approx -0.4$) --- high-valuation countries are \emph{not} high-ROA countries. Consistent across both P/E ($-$0.41) and M/B ($-$0.38).
+\item \textbf{Negative valuation--ROA correlation across countries} ($\rho \approx -0.4$) --- high-valuation countries are \emph{not} high-ROA countries. Earnings growth uncorrelated ($\rho \approx 0$). Points to \emph{discount rates}. Within countries, the P/E--ROA link flips positive ($+$0.80); M/B stays negative ($-$0.59, growth options).
 
 \item \textbf{M/B is leverage-contaminated} --- leverage coefficient $+$0.90*** in M/B, insignificant in P/E. Cross-country leverage heterogeneity (std = 0.095) mechanically inflates M/B variation.
 \end{enumerate}
