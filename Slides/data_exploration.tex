@@ -679,6 +679,20 @@ Local currency & $+$0.49 & $-$0.77 & $-$0.17 \\
 \scriptsize Market cap/GDP ($r=+0.04$), credit/GDP ($r=+0.17$), anti-self-dealing ($r=+0.13$), GDP per capita ($r=+0.01$): all near zero.
 \end{frame}
 
+\begin{frame}{The Correlation Is Not Mechanical (Lagged ROA Test)}
+\vspace{-0.2cm}
+\centering
+\includegraphics[height=0.52\textheight]{scatter_lag_roa_vs_pe.pdf}
+
+\vspace{-0.05cm}
+\footnotesize
+\textbf{Concern}: NI is in both ROA (numerator) and P/E (denominator) --- a temporary earnings shock mechanically raises ROA and lowers P/E.
+
+\textbf{Test}: replace ROA$_t$ with ROA$_{t-1}$. Last year's NI is not in this year's P/E.
+
+\textbf{Result}: correlation barely changes ($-$0.41 $\to$ $-$0.37). Country ROA effects are extremely persistent ($r = 0.99$), so the link reflects \emph{permanent} profitability differences, not transitory earnings.
+\end{frame}
+
 \begin{frame}{Nothing Absorbs the ROA--P/E Link}
 \footnotesize
 \begin{tabular}{@{}lcccc@{}}
