@@ -17,85 +17,85 @@ Regional Valuation and ROA Summary (P/E + M/B)
     M/B trend: early=0.501, late=0.699 (UP +0.198)
 
   Europe:
-    Obs: 118,667
+    Obs: 118,228
     Countries: 31
-    Firms: 12,901
+    Firms: 12,867
     Years: 1987–2024
-    Median log(P/E): 2.718 (N=79,773)
-    VW Mean log(P/E): 4.048
-    Median log(M/B): 0.333 (N=118,667)
-    VW Mean log(M/B): 1.699
+    Median log(P/E): 2.692 (N=79,517)
+    VW Mean log(P/E): 3.137
+    Median log(M/B): 0.298 (N=118,228)
+    VW Mean log(M/B): 0.916
     Median leverage: 0.516
-    Median ROA:      0.0206
-    Mean ROA:        -0.0183
-    P/E trend: early=2.612, late=2.796 (UP +0.184)
-    M/B trend: early=0.224, late=0.480 (UP +0.255)
+    Median ROA:      0.0207
+    Mean ROA:        -0.0180
+    P/E trend: early=2.600, late=2.738 (UP +0.138)
+    M/B trend: early=0.208, late=0.419 (UP +0.211)
 
   Japan:
-    Obs: 60,003
+    Obs: 60,001
     Countries: 1
-    Firms: 4,715
+    Firms: 4,714
     Years: 2001–2024
-    Median log(P/E): 2.660 (N=51,114)
-    VW Mean log(P/E): 2.933
-    Median log(M/B): -0.073 (N=60,003)
-    VW Mean log(M/B): 0.488
+    Median log(P/E): 2.660 (N=51,112)
+    VW Mean log(P/E): 2.927
+    Median log(M/B): -0.073 (N=60,001)
+    VW Mean log(M/B): 0.483
     Median leverage: 0.506
     Median ROA:      0.0277
     Mean ROA:        0.0209
-    P/E trend: early=2.729, late=2.598 (DOWN -0.131)
+    P/E trend: early=2.728, late=2.598 (DOWN -0.131)
     M/B trend: early=-0.188, late=0.022 (UP +0.210)
 
   China:
-    Obs: 58,295
+    Obs: 58,284
     Countries: 1
     Firms: 5,599
     Years: 2007–2024
-    Median log(P/E): 3.642 (N=50,356)
-    VW Mean log(P/E): 3.290
-    Median log(M/B): 0.995 (N=58,295)
-    VW Mean log(M/B): 1.023
+    Median log(P/E): 3.640 (N=50,348)
+    VW Mean log(P/E): 3.276
+    Median log(M/B): 0.993 (N=58,284)
+    VW Mean log(M/B): 0.994
     Median leverage: 0.454
     Median ROA:      0.0316
     Mean ROA:        0.0287
-    P/E trend: early=3.665, late=3.528 (DOWN -0.136)
-    M/B trend: early=1.067, late=0.841 (DOWN -0.226)
+    P/E trend: early=3.663, late=3.526 (DOWN -0.137)
+    M/B trend: early=1.064, late=0.838 (DOWN -0.226)
 
   Other Asia:
-    Obs: 200,317
+    Obs: 200,213
     Countries: 14
-    Firms: 18,411
+    Firms: 18,404
     Years: 1993–2024
-    Median log(P/E): 2.697 (N=151,739)
-    VW Mean log(P/E): 3.147
-    Median log(M/B): 0.157 (N=200,317)
-    VW Mean log(M/B): 1.066
+    Median log(P/E): 2.692 (N=151,681)
+    VW Mean log(P/E): 2.950
+    Median log(M/B): 0.149 (N=200,213)
+    VW Mean log(M/B): 0.885
     Median leverage: 0.469
     Median ROA:      0.0264
-    Mean ROA:        0.0190
-    P/E trend: early=2.460, late=2.845 (UP +0.384)
-    M/B trend: early=0.042, late=0.328 (UP +0.286)
+    Mean ROA:        0.0191
+    P/E trend: early=2.455, late=2.840 (UP +0.385)
+    M/B trend: early=0.035, late=0.318 (UP +0.283)
 
 ======================================================================
 P/E Gap: US minus Region (recent 5 years)
 ======================================================================
-  US - Europe      : +0.110 log points (~+12% in levels, EW median)
-  US - Europe      : -0.950 log points (~-61% in levels, VW mean)
+  US - Europe      : +0.168 log points (~+18% in levels, EW median)
+  US - Europe      : +0.218 log points (~+24% in levels, VW mean)
   US - Japan       : +0.308 log points (~+36% in levels, EW median)
   US - Japan       : +0.434 log points (~+54% in levels, VW mean)
-  US - China       : -0.659 log points (~-48% in levels, EW median)
+  US - China       : -0.657 log points (~-48% in levels, EW median)
   US - China       : +0.065 log points (~+7% in levels, VW mean)
-  US - Other Asia  : +0.061 log points (~+6% in levels, EW median)
-  US - Other Asia  : +0.145 log points (~+16% in levels, VW mean)
+  US - Other Asia  : +0.066 log points (~+7% in levels, EW median)
+  US - Other Asia  : +0.394 log points (~+48% in levels, VW mean)
 
 ======================================================================
 M/B Gap: US minus Region (recent 5 years)
 ======================================================================
-  US - Europe      : +0.223 log points (~+25% in levels, EW median)
-  US - Europe      : -0.169 log points (~-16% in levels, VW mean)
+  US - Europe      : +0.283 log points (~+33% in levels, EW median)
+  US - Europe      : +0.800 log points (~+123% in levels, VW mean)
   US - Japan       : +0.681 log points (~+98% in levels, EW median)
   US - Japan       : +1.275 log points (~+258% in levels, VW mean)
-  US - China       : -0.198 log points (~-18% in levels, EW median)
-  US - China       : +0.833 log points (~+130% in levels, VW mean)
-  US - Other Asia  : +0.398 log points (~+49% in levels, EW median)
-  US - Other Asia  : +0.827 log points (~+129% in levels, VW mean)
+  US - China       : -0.196 log points (~-18% in levels, EW median)
+  US - China       : +0.840 log points (~+132% in levels, VW mean)
+  US - Other Asia  : +0.408 log points (~+50% in levels, EW median)
+  US - Other Asia  : +1.064 log points (~+190% in levels, VW mean)

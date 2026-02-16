@@ -298,10 +298,14 @@ def load_us_panel() -> pd.DataFrame:
         df.loc[mask_valid, "lag_earn_growth"]
     )
 
+    # US firms use US GAAP
+    df["acctstd"] = "DA"
+
     # Keep needed columns
     keep = [
         "gvkey", "fyear", "fic", "ggroup", "market_cap", "ceq", "at", "ib",
         "log_mb", "log_pe", "roa", "log_at", "leverage", "lag_earn_growth",
+        "acctstd",
     ]
     df = df[keep].copy()
 
@@ -321,6 +325,9 @@ def load_global_panel() -> pd.DataFrame:
     """Load Compustat Global + Returns Global, merge for market cap.
 
     Market cap = cshoi (shares outstanding) * prccm (fiscal year-end price).
+    Uses ``prirow`` (primary security for rest-of-world) to select the
+    correct price from the returns file, avoiding cross-currency listings
+    and different share-class denominations.
 
     Returns
     -------
@@ -332,7 +339,7 @@ def load_global_panel() -> pd.DataFrame:
     # --- Compustat Global fundamentals ---
     fund_cols = [
         "gvkey", "fyear", "datadate", "at", "ceq", "ib", "ggroup",
-        "cshoi", "fic",
+        "cshoi", "fic", "prirow", "curcd", "acctstd",
     ]
     df = pd.read_csv(
         DATA_DIR / "compustat_global.csv",
@@ -347,7 +354,7 @@ def load_global_panel() -> pd.DataFrame:
     df["ym"] = df["datadate"].dt.to_period("M")
 
     # --- Returns Global (for fiscal year-end price) ---
-    ret_cols = ["gvkey", "datadate", "prccm"]
+    ret_cols = ["gvkey", "datadate", "prccm", "iid", "curcdm"]
     df_ret = pd.read_csv(
         DATA_DIR / "returns_global.csv",
         usecols=ret_cols,
@@ -359,18 +366,27 @@ def load_global_panel() -> pd.DataFrame:
     df_ret["datadate"] = pd.to_datetime(df_ret["datadate"], errors="coerce")
     df_ret["ym"] = df_ret["datadate"].dt.to_period("M")
 
-    # Deduplicate: one price per gvkey-month (take max prccm across iids)
-    df_ret = (
-        df_ret.groupby(["gvkey", "ym"])["prccm"]
-        .max()
-        .reset_index()
-    )
-
-    # Merge: fundamentals ← price at fiscal year-end month
+    # Use prirow to select the primary security for each firm.
+    # prirow maps to the iid in the returns file (e.g., "01W", "02W").
+    # This avoids cross-currency listings (e.g., HUF listing for a EUR firm)
+    # and different share-class denominations (e.g., pre/post redenomination
+    # in Turkey).
+    df_ret = df_ret.rename(columns={"iid": "prirow"})
     n_before = len(df)
-    df = df.merge(df_ret, on=["gvkey", "ym"], how="left")
-    rprint(f"  After merge: {df['prccm'].notna().sum():,}/{n_before:,} "
-           f"have fiscal year-end price")
+    df = df.merge(
+        df_ret[["gvkey", "ym", "prirow", "prccm", "curcdm"]],
+        on=["gvkey", "ym", "prirow"],
+        how="left",
+    )
+    n_matched = df["prccm"].notna().sum()
+    rprint(f"  After prirow merge: {n_matched:,}/{n_before:,} "
+           f"have fiscal year-end price ({n_matched/n_before*100:.1f}%)")
+
+    # Validate currency alignment
+    cur_match = (df["curcd"] == df["curcdm"]).sum()
+    cur_total = df["curcdm"].notna().sum()
+    rprint(f"  Currency alignment: {cur_match:,}/{cur_total:,} match "
+           f"({cur_match/max(cur_total,1)*100:.1f}%)")
 
     del df_ret
     gc.collect()
@@ -422,6 +438,7 @@ def load_global_panel() -> pd.DataFrame:
     keep = [
         "gvkey", "fyear", "fic", "ggroup", "market_cap", "ceq", "at", "ib",
         "log_mb", "log_pe", "roa", "log_at", "leverage", "lag_earn_growth",
+        "acctstd",
     ]
     df = df[keep].copy()
 
@@ -430,6 +447,14 @@ def load_global_panel() -> pd.DataFrame:
            f"{df['fic'].nunique()} countries, "
            f"fyear {df['fyear'].min():.0f}–{df['fyear'].max():.0f}")
     rprint(f"    P/E available (ib>0): {n_pe:,} ({n_pe/len(df)*100:.0f}%)")
+
+    # Report accounting standard breakdown
+    acct = df["acctstd"].value_counts(dropna=False)
+    rprint("    Accounting standards:")
+    for std, cnt in acct.items():
+        label = {"DI": "IFRS", "DS": "Domestic GAAP", "DA": "US GAAP"}.get(
+            str(std), str(std))
+        rprint(f"      {label}: {cnt:,} ({cnt/len(df)*100:.1f}%)")
     return df
 
 
