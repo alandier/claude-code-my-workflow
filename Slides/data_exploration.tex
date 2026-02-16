@@ -108,8 +108,35 @@ Global prices start 2007.
 \end{frame}
 
 % ===================================================================
-\section{Country Dominates P/E}
+\section{Firm-Level Regressions}
 % ===================================================================
+
+\begin{frame}{Panel Regression: P/E and Firm Controls}
+\vspace{-0.3cm}
+\footnotesize
+\textbf{Dep.\ variable:} $\log(P/E)_{i,t}$ \quad (profitable firms, $NI > 0$)
+
+\vspace{0.05cm}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& \textbf{(1)} & \textbf{(2)} & \textbf{(3)} \\
+\midrule
+Leverage & $-$0.017 (0.102) & $-$0.013 (0.100) & $-$0.015 (0.100) \\
+$\log(\text{Assets})$ & $-$0.076** (0.030) & $-$0.078** (0.031) & $-$0.075** (0.030) \\
+Lag $\Delta$ Earnings & $-$0.016*** (0.003) & $-$0.016*** (0.003) & $-$0.016*** (0.003) \\
+R\&D / Assets & & & $+$2.98*** (0.33) \\
+\midrule
+Fixed effects & C + I + Y & C$\times$Y + I & C + I + Y \\
+$N$ / $R^2$ & 428K / 0.142 & 428K / 0.163 & 428K / 0.148 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.1cm}
+\scriptsize SE clustered by country (in parentheses). C = country, I = industry (GICS), Y = year.
+
+\vspace{0.05cm}
+\small Firm-level R\&D is priced ($t \approx 9$) but \textbf{country effects barely change}: cross-country std dev of $\hat\gamma_c$ drops by only 0.3\%.
+\end{frame}
 
 \begin{frame}{Variance Decomposition: Country vs Industry vs Year}
 \begin{columns}[T]
@@ -141,6 +168,10 @@ Extends Heston--Rouwenhorst (1994) from \emph{returns} to \emph{valuation levels
 \end{columns}
 \end{frame}
 
+% ===================================================================
+\section{Country Effects Are Large and Persistent}
+% ===================================================================
+
 \begin{frame}{Country P/E Effects Over Time (vs USA)}
 \centering
 \includegraphics[height=0.65\textheight]{country_effects_pe.pdf}
@@ -171,16 +202,34 @@ Despite financial globalization, country valuations are \emph{not converging}.
 \end{frame}
 
 % ===================================================================
-\section{What Explains Cross-Country P/E?}
+\section{What Predicts Country P/E Effects?}
 % ===================================================================
 
-\begin{frame}{Standard Institutional Variables Do Not Predict P/E}
-\vspace{-0.3cm}
-\centering
-\includegraphics[height=0.75\textheight]{scatter_findev_vs_pe.pdf}
+\begin{frame}{Cross-Country Regressions: P/E Effects on Country Characteristics}
+\vspace{-0.2cm}
+\footnotesize
+\textbf{Dep.\ variable:} average country P/E effect $\hat\gamma_c$ (log scale, USA = 0)
 
-\vspace{-0.1cm}
-\scriptsize Market cap/GDP ($r=+0.04$), credit/GDP ($r=+0.17$), anti-self-dealing ($r=+0.13$), GDP per capita ($r=+0.01$): all near zero. La Porta et al.\ (2002) variables do not explain valuation levels.
+\vspace{0.05cm}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \textbf{(1)} & \textbf{(2)} & \textbf{(3)} & \textbf{(4)} & \textbf{(5)} & \textbf{(6)} \\
+\midrule
+R\&D / Assets & 4.86*** & & & 4.67*** & & \textbf{6.29***} \\
+& (4.73) & & & (4.72) & & (5.89) \\[1pt]
+Savings / GNI & & 0.016*** & & 0.013*** & & \textbf{0.014***} \\
+& & (3.10) & & (2.75) & & (2.88) \\[1pt]
+IMF GDP growth & & & 0.051 & & 0.051 & 0.051* \\
+\quad (2025--29) & & & (1.42) & & (1.69) & (1.69) \\
+\midrule
+$R^2$ & 0.23 & 0.12 & 0.03 & 0.35 & 0.15 & \textbf{0.45} \\
+$N$ & 76 & 73 & 73 & 65 & 65 & 65 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.05cm}
+\scriptsize $t$-statistics in parentheses. *$p<0.10$, **$p<0.05$, ***$p<0.01$.
+R\&D and savings both independently significant. Growth useful as control but not significant alone.
 \end{frame}
 
 \begin{frame}{National Savings Rate Predicts P/E}
@@ -259,26 +308,62 @@ Growth becomes marginally significant ($t = 1.69$) only as a third control along
 \end{columns}
 \end{frame}
 
-\begin{frame}{Savings and R\&D: Two Independent Channels}
+\begin{frame}{Standard Institutional Variables Do Not Predict P/E}
+\vspace{-0.3cm}
+\centering
+\includegraphics[height=0.75\textheight]{scatter_findev_vs_pe.pdf}
+
+\vspace{-0.1cm}
+\scriptsize Market cap/GDP ($r=+0.04$), credit/GDP ($r=+0.17$), anti-self-dealing ($r=+0.13$), GDP per capita ($r=+0.01$): all near zero. La Porta et al.\ (2002) variables do not explain valuation levels.
+\end{frame}
+
+\begin{frame}{Residual Country Effects After Controls}
 \small
-\begin{tabular}{@{}lcccc@{}}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\textbf{How much P/E variation do we explain?}
+
+\vspace{0.1cm}
+\begin{tabular}{@{}lcc@{}}
 \toprule
-\textbf{P/E $\sim$} & \textbf{R\&D} & \textbf{Savings} & \textbf{Growth} & \textbf{$R^2$} \\
+\textbf{Controls} & $\sigma_\text{resid}$ & \textbf{Reduction} \\
 \midrule
-R\&D only & 4.86 (4.73) & & & 0.23 \\
-Savings only & & 0.016 (3.10) & & 0.12 \\
-R\&D + Savings & 4.67 (4.72) & 0.013 (2.75) & & 0.35 \\
+Raw country effects & 0.394 & --- \\
++ Firm-level R\&D & 0.393 & 0.3\% \\
 \addlinespace
-\textbf{All three} & \textbf{6.29 (5.89)} & \textbf{0.014 (2.88)} & 0.051 (1.69) & \textbf{0.45} \\
+R\&D + Savings & 0.315 & 20\% \\
+R\&D + Sav + Growth & 0.293 & 26\% \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.15cm}
 \footnotesize
-R\&D and savings both survive jointly. Growth is a useful control but not independently significant. Together: $R^2 = 0.45$ ($n = 65$).
+Country-level R\&D and savings explain 26\% of cross-country P/E variation.
+
+74\% remains: large residual country effects persist.
+\end{column}
+\begin{column}{0.42\textwidth}
+\footnotesize
+\vspace{0.2cm}
+\textbf{Largest unexplained effects:}
 
 \vspace{0.1cm}
-55\% of cross-country P/E variation remains unexplained --- large residual country effects persist (e.g.\ China, Chile).
+\begin{tabular}{@{}lcc@{}}
+\toprule
+& Raw & Residual \\
+\midrule
+CHN & $+$0.71 & $+$0.50 \\
+IND & $+$0.42 & $+$0.33 \\
+USA & 0 & $-$0.12 \\
+BRA & $-$0.56 & $-$0.32 \\
+JPN & $-$0.01 & $+$0.11 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.1cm}
+China's premium survives all controls. Brazil's discount only partly explained.
+\end{column}
+\end{columns}
 \end{frame}
 
 % ===================================================================
@@ -321,19 +406,20 @@ R\&D and savings both survive jointly. Growth is a useful control but not indepe
 
 \begin{frame}{Stylized Facts}
 \small
-\begin{enumerate}\setlength\itemsep{4pt}
-\item \textbf{Country dominates P/E} --- 65\% of $R^2$ (Shapley). Extends Heston--Rouwenhorst (1994) from returns to valuation levels.
+\begin{enumerate}\setlength\itemsep{3pt}
+\item \textbf{Country dominates P/E} --- 65\% of $R^2$ (Shapley), after controlling for size, leverage, earnings growth, industry. Country effects survive firm-level R\&D control ($\sigma$ drops by 0.3\%).
 
-\item \textbf{P/E dispersion is diverging} --- $\times$2.7 since early 2000s, despite financial globalization.
+\item \textbf{P/E dispersion is diverging} --- $\times$2.7 since early 2000s.
 
-\item \textbf{Two robust predictors of cross-country P/E:}
+\item \textbf{Two robust predictors of country P/E effects:}
 \begin{itemize}\setlength\itemsep{1pt}
-\item \textbf{R\&D intensity} ($r = +0.41$, $t = 3.91$) --- supply-side: firms investing in intangibles.
-\item \textbf{National savings rate} ($r = +0.30$, $t = 2.65$) --- demand-side: more capital chasing equities.
+\item \textbf{R\&D intensity} ($t = 5.89$) --- intangible-intensive countries valued higher.
+\item \textbf{National savings} ($t = 2.88$) --- more capital seeking equity returns.
 \end{itemize}
-Together with growth controls: $R^2 = 0.45$. Both survive jointly.
+\vspace{-0.05cm}
+$R^2 = 0.45$ with growth control ($n = 65$). Both survive jointly. Growth alone is null.
 
-\item \textbf{Not about expected growth} --- IMF GDP forecasts, realized earnings growth: all insignificant. Institutional variables (La Porta), pension funds, equity depth: also null.
+\item \textbf{Large residual effects persist} --- 74\% unexplained. China premium, Brazil discount survive all controls. Not about growth, institutions, or financial development.
 \end{enumerate}
 \end{frame}
 
@@ -377,30 +463,6 @@ Together with growth controls: $R^2 = 0.45$. Both survive jointly.
 % ===================================================================
 \appendix
 \section{Appendix}
-
-\begin{frame}{P/E Regression Specification}
-\small
-\textbf{Main specification} (profitable firms, $NI > 0$):
-\vspace{-0.2cm}
-$$\log(P/E)_{i,t} = \beta_1 \text{Lev} + \beta_2 \log(\text{Assets}) + \beta_3 \Delta E_{t-1} + \gamma_c + \delta_j + \tau_t + \varepsilon_{i,t}$$
-
-\vspace{-0.1cm}
-\begin{tabular}{@{}lcc@{}}
-\toprule
-& Spec 1 & Spec 2 \\
-\midrule
-Leverage & $-$0.017 (0.102) & $-$0.013 (0.100) \\
-$\log(\text{At})$ & $-$0.076** (0.030) & $-$0.078** (0.031) \\
-Lag $\Delta E$ & $-$0.016*** (0.003) & $-$0.016*** (0.003) \\
-\midrule
-FE & Country + Ind + Year & Country$\times$Year + Ind \\
-N / $R^2$ & 428K / 0.142 & 428K / 0.163 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.1cm}
-\footnotesize SE clustered by country. Year-by-year regressions extract $\gamma_c$ with USA = 0.
-\end{frame}
 
 \begin{frame}{Full List of Tested Predictors}
 \vspace{-0.2cm}
