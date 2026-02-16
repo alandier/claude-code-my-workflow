@@ -187,7 +187,7 @@ Despite financial globalization, country valuations are \emph{not converging}.
 \begin{columns}[T]
 \begin{column}{0.52\textwidth}
 \centering
-\includegraphics[width=\textwidth]{scatter_savings_gni_vs_pe.pdf}
+\includegraphics[width=\textwidth]{scatter_savings_vs_pe_ratio.pdf}
 \end{column}
 \begin{column}{0.45\textwidth}
 \small
@@ -195,76 +195,90 @@ Despite financial globalization, country valuations are \emph{not converging}.
 \textbf{Gross savings / GNI} (World Bank):
 
 \vspace{0.15cm}
-$r = +0.34$, \; $t = 3.01$*** \; ($n = 70$)
+$r = +0.30$, \; $t = 2.65$*** \; ($n = 73$)
 
 \vspace{0.15cm}
 \footnotesize
 \textbf{Robust}:
 \begin{itemize}\setlength\itemsep{1pt}
 \item Excl.\ Gulf states: $t = 3.40$
-\item Controlling for ROA: $t = 2.85$
-\item Controlling for GDP/cap: $t = 2.43$
+\item Controlling for R\&D: $t = 2.75$
+\item Controlling for GDP growth: $t = 2.88$
 \end{itemize}
 
 \vspace{0.1cm}
-\textbf{Interpretation}: countries that save more have more capital seeking equity returns, pushing up price multiples. A \emph{demand-side} channel.
-
-\vspace{0.1cm}
-Orthogonal to profitability ($r = -0.12$).
+\textbf{Demand-side channel}: more capital seeking equity returns pushes up price multiples.
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Summary: What Predicts Country P/E?}
+\begin{frame}{R\&D Intensity Predicts P/E}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_rd_vs_pe_ratio.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
 \small
-\begin{tabular}{@{}lccc@{}}
+Country R\&D/Assets vs P/E: $r = +0.41$, $t = 3.91$
+
+\vspace{0.1cm}
+\footnotesize
+Physical investment (CapEx): null ($r = +0.03$).
+
+Not an accounting artifact: adding R\&D back to earnings does not change the cross-country pattern. Not driven by IFRS vs GAAP differences.
+
+\vspace{0.1cm}
+\small \textbf{Supply-side channel}: high-P/E countries invest more in \emph{intangibles}, not physical capital.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Not About Expected Growth}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_imf_growth_vs_pe_ratio.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\small
+IMF 5-year GDP growth forecasts vs P/E:
+
+$r = +0.17$, \; $t = 1.42$ \; (null)
+
+\vspace{0.1cm}
+\footnotesize
+Also null: realized earnings growth ($r \approx 0$), realized GDP growth ($r = +0.18$, $t = 1.56$).
+
+\vspace{0.1cm}
+\small Cross-country P/E differences are \textbf{not} driven by expected growth rates. India (6.4\% forecast) has P/E $\approx$ USA. Japan (0.7\%) matches Korea (1.8\%).
+
+\vspace{0.1cm}
+Growth becomes marginally significant ($t = 1.69$) only as a third control alongside R\&D and savings.
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Savings and R\&D: Two Independent Channels}
+\small
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Variable} & \textbf{Corr with P/E} & \textbf{$t$-stat} & \textbf{$N$} \\
+\textbf{P/E $\sim$} & \textbf{R\&D} & \textbf{Savings} & \textbf{Growth} & \textbf{$R^2$} \\
 \midrule
-\textbf{Savings / GNI} & $\mathbf{+0.34}$*** & $\mathbf{3.01}$ & 70 \\
+R\&D only & 4.86 (4.73) & & & 0.23 \\
+Savings only & & 0.016 (3.10) & & 0.12 \\
+R\&D + Savings & 4.67 (4.72) & 0.013 (2.75) & & 0.35 \\
 \addlinespace
-Private Credit / GDP & $+$0.17 & 1.30 & 72 \\
-Anti-Self-Dealing Index & $+$0.13 & 0.92 & 52 \\
-Stock Market Cap / GDP & $+$0.04 & 0.29 & 67 \\
-GDP per capita (PPP) & $+$0.01 & 0.09 & 73 \\
-\addlinespace
-Pension Fund Assets / GDP & $+$0.14 & 1.16 & 56 \\
-Equity Market Depth & $\sim$0 & --- & various \\
+\textbf{All three} & \textbf{6.29 (5.89)} & \textbf{0.014 (2.88)} & 0.051 (1.69) & \textbf{0.45} \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.15cm}
-\footnotesize Savings/GNI is the \textbf{only} significant predictor of cross-country P/E among standard macro and institutional variables.
-\end{frame}
+\footnotesize
+R\&D and savings both survive jointly. Growth is a useful control but not independently significant. Together: $R^2 = 0.45$ ($n = 65$).
 
-% ===================================================================
-\section{A Profitability Puzzle}
-% ===================================================================
-
-\begin{frame}{High-P/E Countries Have Lower Profitability}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter_roa_vs_pe.pdf}
-\end{column}
-\begin{column}{0.48\textwidth}
-\small
-Country ROA vs P/E: $r = -0.41$
-
-\vspace{0.05cm}
-\begin{itemize}\setlength\itemsep{2pt}
-\item Not mechanical: lagged ROA gives $r = -0.37$
-\item Not industry composition: robust with/without industry FE
-\item Earnings growth uncorrelated ($r \approx 0$)
-\end{itemize}
-
-\vspace{0.05cm}
-\textbf{Within} countries, the sign flips ($r = +0.80$).
-
-\vspace{0.05cm}
-\footnotesize Consistent with a \emph{discount rate} rather than cash flow story. Details in appendix.
-\end{column}
-\end{columns}
+\vspace{0.1cm}
+55\% of cross-country P/E variation remains unexplained --- large residual country effects persist (e.g.\ China, Chile).
 \end{frame}
 
 % ===================================================================
@@ -312,11 +326,14 @@ Country ROA vs P/E: $r = -0.41$
 
 \item \textbf{P/E dispersion is diverging} --- $\times$2.7 since early 2000s, despite financial globalization.
 
-\item \textbf{National savings rate predicts P/E} ($r = +0.34$, $t = 3.01$). More savings $\Rightarrow$ more capital chasing equities $\Rightarrow$ higher multiples. The only significant macro predictor.
+\item \textbf{Two robust predictors of cross-country P/E:}
+\begin{itemize}\setlength\itemsep{1pt}
+\item \textbf{R\&D intensity} ($r = +0.41$, $t = 3.91$) --- supply-side: firms investing in intangibles.
+\item \textbf{National savings rate} ($r = +0.30$, $t = 2.65$) --- demand-side: more capital chasing equities.
+\end{itemize}
+Together with growth controls: $R^2 = 0.45$. Both survive jointly.
 
-\item \textbf{Standard institutional variables are null} --- La Porta, financial development, GDP per capita: all insignificant.
-
-\item \textbf{High-P/E countries are less profitable} ($r = -0.41$). Consistent with a discount rate channel rather than a cash flow story.
+\item \textbf{Not about expected growth} --- IMF GDP forecasts, realized earnings growth: all insignificant. Institutional variables (La Porta), pension funds, equity depth: also null.
 \end{enumerate}
 \end{frame}
 
@@ -385,27 +402,32 @@ N / $R^2$ & 428K / 0.142 & 428K / 0.163 \\
 \footnotesize SE clustered by country. Year-by-year regressions extract $\gamma_c$ with USA = 0.
 \end{frame}
 
-\begin{frame}{Profitability Puzzle: Robustness Details}
-\footnotesize
-\begin{tabular}{@{}lcc@{}}
+\begin{frame}{Full List of Tested Predictors}
+\vspace{-0.2cm}
+\scriptsize
+\begin{tabular}{@{}lccc@{}}
 \toprule
-\textbf{Specification} & \textbf{$r$(ROA, P/E)} & \textbf{Note} \\
+\textbf{Variable} & \textbf{$r$ with P/E} & \textbf{$t$-stat} & \textbf{$N$} \\
 \midrule
-Raw country averages & $-$0.02 & No controls \\
-Industry$\times$year demeaned & $+$0.11 & Industry removed \\
+\textbf{R\&D / Assets} & $\mathbf{+0.48}$*** & $\mathbf{4.73}$ & 76 \\
+\textbf{Savings / GNI} & $\mathbf{+0.34}$*** & $\mathbf{3.13}$ & 68 \\
 \addlinespace
-Regression \textbf{without} industry FE & $-$0.46 & Size + leverage + earn.\ growth \\
-Regression \textbf{with} industry FE & $-$0.41 & Main specification \\
-Using lagged ROA$_{t-1}$ & $-$0.37 & Breaks mechanical link \\
+ROA & $-$0.39 & $-$3.75 & 76 \\
+\quad \emph{after R\&D control} & \emph{$-$0.08} & \emph{$-$0.76} & 76 \\
 \addlinespace
-\textbf{With USD size controls:} \\
-Both P/E and ROA control for size & $-$0.64 & Strongest \\
-No size controls on either side & $-$0.02 & Disappears \\
+Private Credit / GDP & $+$0.17 & 1.30 & 72 \\
+Pension Fund Assets / GDP & $+$0.14 & 1.16 & 56 \\
+IMF GDP growth forecast & $+$0.13 & 1.07 & 73 \\
+Anti-Self-Dealing Index & $+$0.13 & 0.92 & 52 \\
+Stock Market Cap / GDP & $+$0.04 & 0.29 & 67 \\
+GDP per capita (PPP) & $+$0.01 & 0.09 & 73 \\
+Realized earnings growth & $-$0.00 & $-$0.04 & 80 \\
+CapEx / Assets & $+$0.03 & 0.24 & 78 \\
 \bottomrule
 \end{tabular}
 
-\vspace{0.1cm}
-\footnotesize The negative correlation is a \textbf{Simpson's paradox}: within each size bucket, high-ROA countries have lower P/E. Without size controls, this is masked. Effect is stronger with USD-converted assets ($-$0.64 vs $-$0.51 local), ruling out a currency artifact.
+\vspace{0.05cm}
+\scriptsize ROA appears significant alone but is absorbed by R\&D. The ROA--P/E correlation is mediated by intangible investment intensity.
 \end{frame}
 
 \begin{frame}{Market Cap Construction (Detail)}
