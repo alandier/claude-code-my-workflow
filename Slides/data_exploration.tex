@@ -634,7 +634,7 @@ Earnings growth is \emph{uncorrelated} with valuations. Japan has higher growth 
 \section{What Explains the ROA--Valuation Puzzle?}
 % ===================================================================
 
-\begin{frame}{Countries with Smaller Firms Have Higher ROA and Lower P/E}
+\begin{frame}{Firm Size in Local Currency Absorbs the Puzzle\ldots}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
 \centering
@@ -646,39 +646,28 @@ Earnings growth is \emph{uncorrelated} with valuations. Japan has higher growth 
 \end{column}
 \end{columns}
 \vspace{0.05cm}
-\footnotesize Each dot is a country. Size = average $\log(\text{Assets})$ of listed firms.
-Countries with smaller firms (capital-starved?) have \emph{higher} ROA ($r = -0.70$) yet \emph{lower} P/E ($r = +0.54$). Consistent with suboptimally small firms earning high returns on limited capital, while facing high discount rates.
+\footnotesize Each dot is a country. Size = average $\log(\text{Assets})$ in \emph{local currency}.
+Countries with smaller firms have higher ROA ($r = -0.70$) and lower P/E ($r = +0.54$). Controlling for size renders ROA insignificant on P/E ($t$: $-$4.57 $\to$ $-$1.63). But is size real or a currency artifact?
 \end{frame}
 
-\begin{frame}{Firm Size Absorbs the Negative ROA--P/E Link}
-\vspace{-0.2cm}
-\begin{columns}[T]
-\begin{column}{0.51\textwidth}
+\begin{frame}{\ldots But the Size Effect Is a Currency Artifact}
+\vspace{-0.25cm}
 \centering
-\includegraphics[width=\textwidth]{scatter_roa_vs_pe_size_resid.pdf}
-\end{column}
-\begin{column}{0.46\textwidth}
-\footnotesize
-\vspace{0.1cm}
+\includegraphics[height=0.52\textheight]{scatter_size_local_vs_usd.pdf}
+
+\vspace{-0.1cm}
+\scriptsize
 \begin{tabular}{@{}lccc@{}}
 \toprule
-\textbf{P/E effect} & \textbf{(1)} & \textbf{(2)} & \textbf{(3)} \\
+& \textbf{Size vs P/E} & \textbf{Size vs ROA} & \textbf{Partial $r$(ROA, P/E $|$ size)} \\
 \midrule
-ROA & $-$3.01*** & $-$1.44 & $-$1.97** \\
-    & \scriptsize($-$4.57) & \scriptsize($-$1.63) & \scriptsize($-$2.45) \\[2pt]
-Avg Size & & 0.058** & \\
-         & & \scriptsize(2.54) & \\[2pt]
-Small share & & & $-$0.34** \\
-            & & & \scriptsize($-$2.15) \\
-\midrule
-$R^2$ & .252 & .323 & .304 \\
+Local currency & $+$0.49 & $-$0.77 & $-$0.17 \\
+\textbf{USD-converted} & $\mathbf{+0.15}$ & $\mathbf{-0.12}$ & $\mathbf{-0.47}$ \\
 \bottomrule
 \end{tabular}
 
-\vspace{0.1cm}
-ROA becomes \textbf{insignificant} once avg firm size is added. Size absorbs $\sim$60\% of the negative correlation ($r$: $-$0.50 $\to$ $-$0.20).
-\end{column}
-\end{columns}
+\vspace{0.05cm}
+\scriptsize Local currency: JPN $\log(at)=10.8$, KOR $12.6$, IDN $13.6$. In USD: 6.1, 5.6, 4.2. After conversion, size no longer absorbs the ROA--P/E link.
 \end{frame}
 
 \begin{frame}{Standard Financial Development Indicators Do Not Explain P/E}
@@ -690,8 +679,8 @@ ROA becomes \textbf{insignificant} once avg firm size is added. Size absorbs $\s
 \scriptsize Market cap/GDP ($r=+0.04$), credit/GDP ($r=+0.17$), anti-self-dealing ($r=+0.13$), GDP per capita ($r=+0.01$): all near zero.
 \end{frame}
 
-\begin{frame}{Financial Development Does Not Absorb the ROA--P/E Link}
-\small
+\begin{frame}{Nothing Absorbs the ROA--P/E Link}
+\footnotesize
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 & \multicolumn{2}{c}{\textbf{Corr with}} & \textbf{Partial $r$} & \\
@@ -705,12 +694,13 @@ Anti-Self-Dealing Index & $+$0.13 & $-$0.24 & $-$0.55 & 52 \\
 Rule of Law & $+$0.05 & $-$0.03 & --- & 73 \\
 GDP per capita (PPP) & $+$0.01 & $+$0.01 & --- & 73 \\
 \addlinespace
-\textbf{Avg firm size} & $\mathbf{+0.52}$ & $\mathbf{-0.71}$ & $\mathbf{-0.06}$ & \textbf{64} \\
+Avg firm size (local ccy) & $+$0.49 & $-$0.77 & $-$0.17 & 72 \\
+Avg firm size (USD) & $+$0.15 & $-$0.12 & $-$0.47 & 72 \\
 \bottomrule
 \end{tabular}
 
-\vspace{0.15cm}
-\footnotesize Standard institutional variables (La Porta et al., financial depth) have near-zero correlation with P/E effects. Only avg $\log(\text{Assets})$ absorbs the puzzle --- but assets are in \emph{local currency}, so this partly captures currency denomination (Japan, Korea, Indonesia appear ``large'').
+\vspace{0.1cm}
+\scriptsize Standard institutional variables have near-zero correlation with P/E effects. Local-currency size appeared to absorb the puzzle, but was a \textbf{currency artifact}. The ROA--P/E puzzle remains \textbf{unexplained}.
 \end{frame}
 
 % ===================================================================
@@ -745,7 +735,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 
 \item \textbf{Country dominates profitability too} --- for ROA, country edges industry (51\% vs 45\%).
 
-\item \textbf{Negative valuation--ROA correlation across countries} ($\rho \approx -0.4$) --- partly explained by firm size: countries with smaller (capital-starved?) firms have higher ROA ($r=-0.70$) but lower P/E. Controlling for avg firm size renders ROA insignificant. Within countries, P/E--ROA flips positive ($+$0.80).
+\item \textbf{Negative valuation--ROA correlation across countries} ($\rho \approx -0.4$) --- \emph{not} explained by financial development (La Porta), GDP per capita, or firm size (in USD). Within countries, P/E--ROA flips positive ($+$0.80). The cross-country puzzle remains open.
 
 \item \textbf{M/B is leverage-contaminated} --- leverage coefficient $+$0.90*** in M/B, insignificant in P/E. Cross-country leverage heterogeneity (std = 0.095) mechanically inflates M/B variation.
 \end{enumerate}
@@ -804,7 +794,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 
 \item \textbf{Can we decompose the country effect?} --- Discount rates, growth expectations, investor protection, capital controls, accounting norms
 
-\item \textbf{Why are valuations negatively correlated with ROA?} ($\rho \approx -0.4$) --- Avg firm size absorbs the link, but standard financial development indicators (market cap/GDP, credit/GDP, anti-self-dealing, rule of law) do \emph{not}. Size partly confounded by currency denomination. The puzzle remains open.
+\item \textbf{Why are valuations negatively correlated with ROA?} ($\rho \approx -0.4$) --- Not explained by financial development, investor protection, GDP per capita, or firm size (in USD). Local-currency size appeared to work but was a currency artifact. A genuine open puzzle.
 
 \item \textbf{Japan as natural experiment} --- P/E $\approx 0$ vs M/B $= -0.35$: can we bound the ``accounting noise'' in M/B?
 \end{enumerate}
@@ -815,7 +805,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 \begin{enumerate}\setlength\itemsep{2pt}
 \item \textbf{EV/EBITDA} as third metric --- avoids book equity issues (M/B) and profitable-firms restriction (P/E)
 
-\item \textbf{Institutional variables} --- La Porta variables show weak correlations; try capital controls, FDI openness, listing standards, firm-level currency-adjusted size
+\item \textbf{Institutional variables} --- La Porta variables surprisingly weak; try capital controls, FDI openness, expected growth proxies, risk measures
 
 \item \textbf{Realized returns} --- do low-valuation countries earn higher returns? (Bekaert--Harvey, Fama--French international)
 
