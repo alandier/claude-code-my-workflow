@@ -53,3 +53,6 @@ Thumbs.db
 # Output artifacts — uncomment lines below based on your preference
 # *.rds
 # output/**/*.rds
+
+# Large cached data files
+output/regressions/panel_data.parquet
