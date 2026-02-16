@@ -631,7 +631,7 @@ Earnings growth is \emph{uncorrelated} with valuations. Japan has higher growth 
 \end{frame}
 
 % ===================================================================
-\section{Firm Size and Capital Starvation}
+\section{What Explains the ROA--Valuation Puzzle?}
 % ===================================================================
 
 \begin{frame}{Countries with Smaller Firms Have Higher ROA and Lower P/E}
@@ -679,6 +679,38 @@ $R^2$ & .252 & .323 & .304 \\
 ROA becomes \textbf{insignificant} once avg firm size is added. Size absorbs $\sim$60\% of the negative correlation ($r$: $-$0.50 $\to$ $-$0.20).
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Standard Financial Development Indicators Do Not Explain P/E}
+\vspace{-0.3cm}
+\centering
+\includegraphics[height=0.75\textheight]{scatter_findev_vs_pe.pdf}
+
+\vspace{-0.1cm}
+\scriptsize Market cap/GDP ($r=+0.04$), credit/GDP ($r=+0.17$), anti-self-dealing ($r=+0.13$), GDP per capita ($r=+0.01$): all near zero.
+\end{frame}
+
+\begin{frame}{Financial Development Does Not Absorb the ROA--P/E Link}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{Corr with}} & \textbf{Partial $r$} & \\
+\textbf{Control variable} & \textbf{P/E} & \textbf{ROA} & \textbf{(ROA, P/E $|$ control)} & \textbf{N} \\
+\midrule
+\emph{None (raw)} & --- & --- & $-$0.41 & 81 \\
+\addlinespace
+Stock Market Cap / GDP & $+$0.04 & $-$0.17 & $-$0.50 & 67 \\
+Private Credit / GDP & $+$0.17 & $-$0.20 & $-$0.45 & 72 \\
+Anti-Self-Dealing Index & $+$0.13 & $-$0.24 & $-$0.55 & 52 \\
+Rule of Law & $+$0.05 & $-$0.03 & --- & 73 \\
+GDP per capita (PPP) & $+$0.01 & $+$0.01 & --- & 73 \\
+\addlinespace
+\textbf{Avg firm size} & $\mathbf{+0.52}$ & $\mathbf{-0.71}$ & $\mathbf{-0.06}$ & \textbf{64} \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.15cm}
+\footnotesize Standard institutional variables (La Porta et al., financial depth) have near-zero correlation with P/E effects. Only avg $\log(\text{Assets})$ absorbs the puzzle --- but assets are in \emph{local currency}, so this partly captures currency denomination (Japan, Korea, Indonesia appear ``large'').
 \end{frame}
 
 % ===================================================================
@@ -772,7 +804,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 
 \item \textbf{Can we decompose the country effect?} --- Discount rates, growth expectations, investor protection, capital controls, accounting norms
 
-\item \textbf{Why are valuations negatively correlated with ROA?} ($\rho \approx -0.4$) --- Firm size absorbs $\sim$60\% of the link. Capital starvation story: underdeveloped capital markets $\to$ small firms $\to$ high ROA + high discount rates. Can we link to financial development indicators?
+\item \textbf{Why are valuations negatively correlated with ROA?} ($\rho \approx -0.4$) --- Avg firm size absorbs the link, but standard financial development indicators (market cap/GDP, credit/GDP, anti-self-dealing, rule of law) do \emph{not}. Size partly confounded by currency denomination. The puzzle remains open.
 
 \item \textbf{Japan as natural experiment} --- P/E $\approx 0$ vs M/B $= -0.35$: can we bound the ``accounting noise'' in M/B?
 \end{enumerate}
@@ -783,7 +815,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 \begin{enumerate}\setlength\itemsep{2pt}
 \item \textbf{EV/EBITDA} as third metric --- avoids book equity issues (M/B) and profitable-firms restriction (P/E)
 
-\item \textbf{Institutional variables} --- legal origin, anti-self-dealing index, capital controls as country-level regressors
+\item \textbf{Institutional variables} --- La Porta variables show weak correlations; try capital controls, FDI openness, listing standards, firm-level currency-adjusted size
 
 \item \textbf{Realized returns} --- do low-valuation countries earn higher returns? (Bekaert--Harvey, Fama--French international)
 

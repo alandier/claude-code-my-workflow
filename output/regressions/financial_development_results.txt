@@ -1,0 +1,28 @@
+======================================================================
+FINANCIAL DEVELOPMENT AND THE ROA-VALUATION PUZZLE
+======================================================================
+
+CORRELATIONS WITH P/E EFFECT:
+  mktcap_gdp                 r = +0.042  (n=67)
+  credit_gdp                 r = +0.171  (n=72)
+  gdp_pc_ppp                 r = +0.009  (n=73)
+  rule_of_law                r = +0.051  (n=73)
+  anti_self_dealing          r = +0.131  (n=52)
+  fin_dev_composite          r = +0.113  (n=73)
+  mean_log_at                r = +0.523  (n=81)
+
+CORRELATIONS WITH ROA EFFECT:
+  mktcap_gdp                 r = -0.166  (n=67)
+  credit_gdp                 r = -0.200  (n=72)
+  gdp_pc_ppp                 r = +0.010  (n=73)
+  rule_of_law                r = -0.029  (n=73)
+  anti_self_dealing          r = -0.237  (n=52)
+  fin_dev_composite          r = -0.161  (n=73)
+  mean_log_at                r = -0.712  (n=81)
+
+PARTIAL CORRELATIONS: ROA vs P/E after controlling for...
+  Mkt Cap/GDP           raw=-0.50  partial=-0.50  (n=67)
+  Credit/GDP            raw=-0.47  partial=-0.45  (n=72)
+  Anti-Self-Dealing     raw=-0.56  partial=-0.55  (n=52)
+  Fin Dev Composite     raw=-0.48  partial=-0.47  (n=73)
+  Avg Firm Size         raw=-0.41  partial=-0.06  (n=81)
