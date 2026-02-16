@@ -20,7 +20,7 @@
 
 % --- Metadata ---
 \title{Global Valuation}
-\subtitle{Cross-Country Valuation Multiples}
+\subtitle{Cross-Country Price-Earnings Multiples}
 \author{Augustin Landier}
 \institute{HEC Paris}
 \date{February 2026}
@@ -62,24 +62,21 @@
 
 \begin{frame}{Variable Definitions}
 \small
-\textbf{Dependent variables:}
-\vspace{-0.2cm}
-\begin{align*}
-\log(P/E)_{i,t} &= \log\!\left(\frac{\text{Market Cap}_{i,t}}{\text{Net Income}_{i,t}}\right), \quad NI > 0 \\[-2pt]
-\log(M/B)_{i,t} &= \log\!\left(\frac{\text{Market Cap}_{i,t}}{\text{Book Equity}_{i,t}}\right)
-\end{align*}
+\textbf{Dependent variable:}
+\vspace{-0.1cm}
+$$\log(P/E)_{i,t} = \log\!\left(\frac{\text{Market Cap}_{i,t}}{\text{Net Income}_{i,t}}\right), \quad NI > 0$$
 
-\vspace{-0.35cm}
+\vspace{-0.1cm}
 \begin{tabular}{@{}p{2.8cm}p{10cm}@{}}
 Market Cap & US: \texttt{mkvalt}. Global: \texttt{cshoi} $\times$ \texttt{prccm} (primary security) \\
-Book Equity & \texttt{ceq} (common equity). \emph{Does not include debt.} \\
 Net Income & \texttt{ib} (income before extraordinary items) \\
-Leverage & $(\texttt{at} - \texttt{ceq}) / \texttt{at}$ = non-equity share of assets \\
-ROA & \texttt{ib} / \texttt{at}. \quad Industry: GICS Industry Group ($\sim$25 categories)
+ROA & \texttt{ib} / \texttt{at} \\
+Leverage & $(\texttt{at} - \texttt{ceq}) / \texttt{at}$ \\
+Industry & GICS Industry Group ($\sim$25 categories)
 \end{tabular}
 
-\vspace{0.05cm}
-\footnotesize All ratios winsorized at 1st/99th percentiles. All data in local currency (millions).
+\vspace{0.15cm}
+\footnotesize P/E restricted to profitable firms (72\% of sample). All ratios winsorized at 1st/99th percentiles.
 \end{frame}
 
 \begin{frame}{Coverage and Descriptive Statistics}
@@ -96,7 +93,6 @@ ROA & \texttt{ib} / \texttt{at}. \quad Industry: GICS Industry Group ($\sim$25 c
 Variable & N & Median & P10 & P90 \\
 \midrule
 $\log(\text{P/E})$ & 532K & 2.79 & 1.76 & 4.32 \\
-$\log(\text{M/B})$ & 743K & 0.38 & $-$0.78 & 1.73 \\
 ROA & 743K & 0.02 & $-$0.15 & 0.11 \\
 Leverage & 743K & 0.49 & 0.14 & 0.85 \\
 \bottomrule
@@ -106,13 +102,13 @@ Leverage & 743K & 0.49 & 0.14 & 0.85 \\
 \footnotesize
 \textbf{Top 5 by obs:} USA (188K), JPN (60K), CHN (58K), IND (57K), TWN (31K).
 
-P/E restricted to profitable firms (72\%). Global prices start 2007.
+Global prices start 2007.
 \end{column}
 \end{columns}
 \end{frame}
 
 % ===================================================================
-\section{Finding 1: Country Dominates Valuation}
+\section{Country Dominates P/E}
 % ===================================================================
 
 \begin{frame}{Variance Decomposition: Country vs Industry vs Year}
@@ -123,19 +119,21 @@ P/E restricted to profitable firms (72\%). Global prices start 2007.
 \end{column}
 \begin{column}{0.48\textwidth}
 \small
-\textbf{Shapley $R^2$ decomposition:}
+\textbf{Shapley $R^2$ decomposition of $\log(\text{P/E})$:}
 
-\vspace{0.1cm}
-\begin{tabular}{@{}lccc@{}}
-& \textbf{P/E} & \textbf{M/B} & \textbf{ROA} \\
+\vspace{0.15cm}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Factor} & \textbf{Share of $R^2$} \\
 \midrule
-Country & \textbf{64.6\%} & 50.8\% & 50.7\% \\
-Industry & 24.8\% & 35.8\% & 44.8\% \\
-Year & 10.6\% & 13.4\% & 4.5\% \\
+Country & \textbf{64.6\%} \\
+Industry & 24.8\% \\
+Year & 10.6\% \\
+\bottomrule
 \end{tabular}
 
 \vspace{0.2cm}
-Country dominates all three. P/E shows the \emph{strongest} country dependence.
+Country alone explains nearly two-thirds of the variation in P/E.
 
 \vspace{0.1cm}
 Extends Heston--Rouwenhorst (1994) from \emph{returns} to \emph{valuation levels}.
@@ -143,27 +141,16 @@ Extends Heston--Rouwenhorst (1994) from \emph{returns} to \emph{valuation levels
 \end{columns}
 \end{frame}
 
-\begin{frame}{Country Effects on P/E and M/B (vs USA)}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
+\begin{frame}{Country P/E Effects Over Time (vs USA)}
 \centering
-\includegraphics[width=\textwidth]{country_effects_pe.pdf}
+\includegraphics[height=0.65\textheight]{country_effects_pe.pdf}
 
-\scriptsize P/E country effects
-\end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{country_effects_mb.pdf}
-
-\scriptsize M/B country effects
-\end{column}
-\end{columns}
-\vspace{0.1cm}
+\vspace{0.05cm}
 \scriptsize Year-by-year regressions with size, leverage, earnings growth, industry FE. USA = 0.
-China premium is largest but declining; Japan stable near zero (P/E) or deep discount (M/B).
+China premium largest but declining. Japan near zero. India rising since 2015.
 \end{frame}
 
-\begin{frame}{Valuation Dispersion Is Diverging}
+\begin{frame}{P/E Dispersion Is Diverging}
 \begin{columns}[T]
 \begin{column}{0.55\textwidth}
 \centering
@@ -171,219 +158,20 @@ China premium is largest but declining; Japan stable near zero (P/E) or deep dis
 \end{column}
 \begin{column}{0.42\textwidth}
 \vspace{0.2cm}
-\textbf{Dispersion is diverging:}
-\begin{itemize}
-\item P/E: 0.17 $\to$ 0.47 ($\times$2.7)
-\item M/B: 0.40 $\to$ 0.45
-\end{itemize}
+\textbf{P/E dispersion:}
+$$\sigma = 0.17 \;\to\; 0.47 \quad (\times 2.7)$$
+
+\vspace{0.1cm}
+Despite financial globalization, country valuations are \emph{not converging}.
 
 \vspace{0.15cm}
-\textbf{ROA dispersion} more stable ($\sim$0.05--0.10), with a spike during the GFC.
-
-\vspace{0.15cm}
-\small Despite financial globalization, country valuations are \emph{not converging}.
+\small The gap between the most and least expensive countries has nearly tripled since the early 2000s.
 \end{column}
 \end{columns}
 \end{frame}
 
 % ===================================================================
-\section{Finding 2: P/E Is Cleaner Than M/B}
-% ===================================================================
-
-\begin{frame}{Japan: The P/E vs M/B Puzzle}
-\begin{columns}[T]
-\begin{column}{0.55\textwidth}
-\centering
-\includegraphics[width=\textwidth]{country_effects_roa.pdf}
-\end{column}
-\begin{column}{0.42\textwidth}
-\small
-\textbf{Japan's ``discount'' depends on the metric:}
-\begin{itemize}\setlength\itemsep{1pt}
-\item M/B: $-$0.35 (negative 100\% of years)
-\item P/E: $+$0.03 (near zero)
-\item ROA: positive (high profitability)
-\end{itemize}
-
-\vspace{0.15cm}
-Japan's M/B discount reflects \emph{conservative book values} (domestic GAAP, 93\%), not lower market valuations vs earnings.
-
-\vspace{0.1cm}
-P/E is a cleaner cross-country comparison.
-\end{column}
-\end{columns}
-\end{frame}
-
-\begin{frame}{M/B Is Contaminated by Leverage}
-\begin{columns}[T]
-\begin{column}{0.46\textwidth}
-\footnotesize
-\begin{tabular}{@{}p{3.2cm}cc@{}}
-\toprule
-\textbf{Finding} & \textbf{P/E} & \textbf{M/B} \\
-\midrule
-Country $R^2$ share & 64.6\% & 50.8\% \\
-Leverage coeff & $-$0.02 & $+$0.90*** \\
-Japan effect & $+$0.03 & $-$0.35 \\
-Dispersion trend & $\times$2.7 & $\times$1.1 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.1cm}
-\scriptsize
-Leverage is $+$0.90*** in M/B (mechanical: less equity $\Rightarrow$ higher M/B) but insignificant in P/E.
-
-Cross-country leverage std = 0.095, mechanically inflating M/B variation.
-\end{column}
-\begin{column}{0.50\textwidth}
-\centering
-\includegraphics[width=0.95\textwidth]{regional_leverage_timeseries.pdf}
-
-\scriptsize Regional leverage over time
-\end{column}
-\end{columns}
-\end{frame}
-
-% ===================================================================
-\section{Finding 3: A Profitability--Valuation Puzzle}
-% ===================================================================
-
-\begin{frame}{High-Valuation Countries Are Not More Profitable}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter_roa_vs_pe.pdf}
-\end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter_roa_vs_mb.pdf}
-\end{column}
-\end{columns}
-\vspace{0.1cm}
-\small Each dot = a country (average effect vs USA). The negative correlation ($r = -0.41$ for P/E) means high-valuation countries have \emph{lower} profitability. Brazil: discounted yet profitable. China: high P/E, average ROA.
-\end{frame}
-
-\begin{frame}{But Within Countries, High Profitability \textbf{Raises} Valuations}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter_industry_roa_vs_pe.pdf}
-\end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter_industry_roa_vs_mb.pdf}
-\end{column}
-\end{columns}
-\vspace{0.05cm}
-\footnotesize Each dot = a GICS industry group (27 industries, demeaned by country$\times$year).
-\textbf{P/E} ($r = +0.80$): within a country, more profitable industries have higher P/E.
-\textbf{M/B} ($r = -0.59$): reverses (Pharma: low ROA, high M/B from intangibles).
-
-\vspace{0.05cm}
-\textbf{The sign flip} (within-country positive, between-country negative) deepens the puzzle.
-\end{frame}
-
-\begin{frame}{Earnings Growth Does Not Explain Valuations Either}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter_eg_vs_pe.pdf}
-\end{column}
-\begin{column}{0.48\textwidth}
-\small
-\vspace{0.1cm}
-\textbf{Cross-country correlations:}
-
-\vspace{0.1cm}
-\begin{tabular}{@{}lcc@{}}
-\toprule
-& \textbf{P/E} & \textbf{M/B} \\
-\midrule
-vs ROA & $-$0.41 & $-$0.38 \\
-vs Earn.\ Growth & $-$0.09 & $+$0.03 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.1cm}
-Earnings growth is \emph{uncorrelated} with valuations. Japan has higher growth than the US yet near-zero P/E premium.
-
-\vspace{0.1cm}
-\textbf{Implication}: the cross-country valuation spread is a \emph{discount rate} phenomenon, not a cash flow story.
-\end{column}
-\end{columns}
-\end{frame}
-
-% ===================================================================
-\section{Robustness of the Puzzle}
-% ===================================================================
-
-\begin{frame}{The Correlation Is Not Mechanical (Lagged ROA Test)}
-\vspace{-0.2cm}
-\centering
-\includegraphics[height=0.52\textheight]{scatter_lag_roa_vs_pe.pdf}
-
-\vspace{-0.05cm}
-\footnotesize
-\textbf{Concern}: NI is in both ROA (numerator) and P/E (denominator) --- a temporary earnings shock mechanically raises ROA and lowers P/E.
-
-\textbf{Test}: replace ROA$_t$ with ROA$_{t-1}$. Last year's NI is not in this year's P/E.
-
-\textbf{Result}: correlation barely changes ($-$0.41 $\to$ $-$0.37). Country ROA effects are extremely persistent ($r = 0.99$), so the link reflects \emph{permanent} profitability differences.
-\end{frame}
-
-\begin{frame}{Not Industry Composition Either}
-\small
-\begin{tabular}{@{}lcc@{}}
-\toprule
-\textbf{Specification} & \textbf{ROA vs P/E} & \textbf{Note} \\
-\midrule
-Raw country averages & $-$0.02 & No controls \\
-Industry$\times$year demeaned & $+$0.11 & Industry removed, no other controls \\
-\addlinespace
-Regression \textbf{without} industry FE & $-$0.46 & Size + leverage + earn.\ growth \\
-Regression \textbf{with} industry FE & $-$0.41 & Our main specification \\
-\addlinespace
-Using lagged ROA$_{t-1}$ & $-$0.37 & Breaks NI$\to$P/E mechanical link \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.15cm}
-\footnotesize
-\begin{itemize}\setlength\itemsep{1pt}
-\item Industry FE slightly \emph{reduce} the correlation ($-$0.46 $\to$ $-$0.41) --- industry composition is not the driver
-\item The negative link emerges after controlling for firm size (see next slide)
-\item Raw correlation is near zero because size heterogeneity masks the relationship
-\end{itemize}
-\end{frame}
-
-\begin{frame}{It Is a Simpson's Paradox: Size Controls Reveal the Correlation}
-\vspace{-0.2cm}
-\footnotesize
-\begin{tabular}{@{}llcc@{}}
-\toprule
-& & \multicolumn{2}{c}{\textbf{$r$(ROA, P/E)}} \\
-\cmidrule(lr){3-4}
-\textbf{P/E controls} & \textbf{ROA controls} & \textbf{Local} & \textbf{USD} \\
-\midrule
-None & None & $-$0.02 & $-$0.02 \\
-$+$ size & None & --- & $-$0.14 \\
-None & $+$ size & --- & $-$0.15 \\
-\addlinespace
-\textbf{$+$ size} & \textbf{$+$ size} & $\mathbf{-0.51}$ & $\mathbf{-0.64}$ \\
-$+$ size $+$ leverage & $+$ size $+$ leverage & --- & $-$0.65 \\
-Full spec & $+$ size $+$ industry & $-$0.47 & $-$0.59 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.1cm}
-\scriptsize
-The negative ROA--P/E correlation is \textbf{zero} without size controls. It appears \emph{only} when both P/E and ROA regressions control for firm size. The effect is \textbf{stronger} with USD-converted size ($r = -0.64$) --- not a currency artifact.
-
-\textbf{Interpretation (Simpson's paradox)}: within each size bucket, high-ROA countries have lower P/E. But across size buckets, the relationship is masked.
-\end{frame}
-
-% ===================================================================
-\section{What Explains Cross-Country Valuations?}
+\section{What Explains Cross-Country P/E?}
 % ===================================================================
 
 \begin{frame}{Standard Institutional Variables Do Not Predict P/E}
@@ -395,7 +183,7 @@ The negative ROA--P/E correlation is \textbf{zero} without size controls. It app
 \scriptsize Market cap/GDP ($r=+0.04$), credit/GDP ($r=+0.17$), anti-self-dealing ($r=+0.13$), GDP per capita ($r=+0.01$): all near zero. La Porta et al.\ (2002) variables do not explain valuation levels.
 \end{frame}
 
-\begin{frame}{National Savings Rate Predicts Valuations}
+\begin{frame}{National Savings Rate Predicts P/E}
 \begin{columns}[T]
 \begin{column}{0.52\textwidth}
 \centering
@@ -406,120 +194,111 @@ The negative ROA--P/E correlation is \textbf{zero} without size controls. It app
 \vspace{-0.1cm}
 \textbf{Gross savings / GNI} (World Bank):
 
-\vspace{0.1cm}
-\begin{tabular}{@{}lcc@{}}
-\toprule
-& \textbf{P/E} & \textbf{M/B} \\
-\midrule
-Savings/GNI & $+$0.34*** & $+$0.29** \\
- & (t = 3.01) & (t = 1.89) \\
-\addlinespace
-vs ROA & $-$0.12 & \\
-\bottomrule
-\end{tabular}
+\vspace{0.15cm}
+$r = +0.34$, \; $t = 3.01$*** \; ($n = 70$)
 
-\vspace{0.1cm}
+\vspace{0.15cm}
 \footnotesize
-\textbf{Robust}: excl.\ Gulf states $r = +0.41$ (t = 3.40). Survives controlling for ROA (t = 2.85) and GDP per capita (t = 2.43).
+\textbf{Robust}:
+\begin{itemize}\setlength\itemsep{1pt}
+\item Excl.\ Gulf states: $t = 3.40$
+\item Controlling for ROA: $t = 2.85$
+\item Controlling for GDP/cap: $t = 2.43$
+\end{itemize}
 
 \vspace{0.1cm}
 \textbf{Interpretation}: countries that save more have more capital seeking equity returns, pushing up price multiples. A \emph{demand-side} channel.
+
+\vspace{0.1cm}
+Orthogonal to profitability ($r = -0.12$).
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Summary: What Predicts Country P/E Effects?}
-\footnotesize
-\begin{tabular}{@{}lcccc@{}}
+\begin{frame}{Summary: What Predicts Country P/E?}
+\small
+\begin{tabular}{@{}lccc@{}}
 \toprule
-& \multicolumn{2}{c}{\textbf{Corr with}} & \textbf{Partial $r$} & \\
-\textbf{Variable} & \textbf{P/E} & \textbf{ROA} & \textbf{(ROA, P/E $|$ var)} & \textbf{N} \\
+\textbf{Variable} & \textbf{Corr with P/E} & \textbf{$t$-stat} & \textbf{$N$} \\
 \midrule
-\emph{None (raw)} & --- & --- & $-$0.41 & 81 \\
+\textbf{Savings / GNI} & $\mathbf{+0.34}$*** & $\mathbf{3.01}$ & 70 \\
 \addlinespace
-\textbf{Savings / GNI} & $\mathbf{+0.34}$*** & $-$0.12 & $-$0.49 & 70 \\
+Private Credit / GDP & $+$0.17 & 1.30 & 72 \\
+Anti-Self-Dealing Index & $+$0.13 & 0.92 & 52 \\
+Stock Market Cap / GDP & $+$0.04 & 0.29 & 67 \\
+GDP per capita (PPP) & $+$0.01 & 0.09 & 73 \\
 \addlinespace
-Stock Market Cap / GDP & $+$0.04 & $-$0.17 & $-$0.50 & 67 \\
-Private Credit / GDP & $+$0.17 & $-$0.20 & $-$0.45 & 72 \\
-Anti-Self-Dealing Index & $+$0.13 & $-$0.24 & $-$0.55 & 52 \\
-GDP per capita (PPP) & $+$0.01 & $+$0.01 & --- & 73 \\
-\addlinespace
-Avg firm size (local ccy) & $+$0.49 & $-$0.77 & $-$0.17 & 72 \\
-Avg firm size (USD) & $+$0.15 & $-$0.12 & $-$0.47 & 72 \\
+Pension Fund Assets / GDP & $+$0.14 & 1.16 & 56 \\
+Equity Market Depth & $\sim$0 & --- & various \\
 \bottomrule
 \end{tabular}
 
-\vspace{0.1cm}
-\scriptsize Savings/GNI is the \textbf{only} significant predictor of P/E (t = 3.01). Institutional variables are null. Local-currency size was a currency artifact. Savings/GNI is orthogonal to ROA, so it does not absorb the ROA--P/E puzzle.
+\vspace{0.15cm}
+\footnotesize Savings/GNI is the \textbf{only} significant predictor of cross-country P/E among standard macro and institutional variables.
+\end{frame}
+
+% ===================================================================
+\section{A Profitability Puzzle}
+% ===================================================================
+
+\begin{frame}{High-P/E Countries Have Lower Profitability}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_roa_vs_pe.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\small
+Country ROA vs P/E: $r = -0.41$
+
+\vspace{0.05cm}
+\begin{itemize}\setlength\itemsep{2pt}
+\item Not mechanical: lagged ROA gives $r = -0.37$
+\item Not industry composition: robust with/without industry FE
+\item Earnings growth uncorrelated ($r \approx 0$)
+\end{itemize}
+
+\vspace{0.05cm}
+\textbf{Within} countries, the sign flips ($r = +0.80$).
+
+\vspace{0.05cm}
+\footnotesize Consistent with a \emph{discount rate} rather than cash flow story. Details in appendix.
+\end{column}
+\end{columns}
 \end{frame}
 
 % ===================================================================
 \section{Regional Patterns}
 % ===================================================================
 
-\begin{frame}{Regional P/E and M/B Over Time}
+\begin{frame}{Regional P/E Over Time}
 \begin{columns}[T]
-\begin{column}{0.48\textwidth}
+\begin{column}{0.55\textwidth}
 \centering
 \includegraphics[width=\textwidth]{regional_pe_vw_timeseries.pdf}
-
-\scriptsize Value-weighted P/E
 \end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{regional_mb_vw_timeseries.pdf}
-
-\scriptsize Value-weighted M/B
-\end{column}
-\end{columns}
-\vspace{0.1cm}
-\scriptsize US dominates in VW (tech firms). Japan's M/B discount is stark (book value conservatism), but P/E is near Europe. China P/E volatile and declining since 2015.
-\end{frame}
-
-\begin{frame}{The US Valuation Premium (Recent 5 Years)}
-\begin{table}
-\centering
+\begin{column}{0.42\textwidth}
 \small
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-& \multicolumn{2}{c}{\textbf{P/E gap}} & \multicolumn{2}{c}{\textbf{M/B gap}} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5}
-\textbf{US minus} & EW & VW & EW & VW \\
-\midrule
-Europe & $+$18\% & $+$24\% & $+$33\% & $+$123\% \\
-Japan & $+$36\% & $+$54\% & $+$98\% & $+$258\% \\
-China & $-$48\% & $+$7\% & $-$18\% & $+$132\% \\
-Other Asia & $+$7\% & $+$48\% & $+$50\% & $+$190\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+\vspace{0.3cm}
+\textbf{Key patterns:}
+\begin{itemize}\setlength\itemsep{3pt}
+\item US P/E premium is recent and driven by large firms (tech)
+\item China P/E volatile, declining since 2015
+\item Japan near Europe
+\end{itemize}
 
 \vspace{0.1cm}
-\begin{itemize}\small
-\item VW gaps are much larger than EW --- US premium is concentrated in large firms (tech)
-\item Japan: P/E gap $+$54\% but M/B gap $+$258\% --- most of the M/B gap is book equity measurement
-\item China: EW gap is $-$48\% (China P/E higher, driven by small firms); VW gap only $+$7\%
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Industry $\times$ Country Interaction}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{industry_country_heatmap.pdf}
-
-\scriptsize P/E country effects by sector
-\end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{industry_country_heatmap_mb.pdf}
-
-\scriptsize M/B country effects by sector
+\footnotesize Value-weighted averages. VW gaps larger than EW --- US premium concentrated in mega-caps.
 \end{column}
 \end{columns}
+\end{frame}
 
-\vspace{0.1cm}
-\scriptsize Country effects vs USA by GICS sector. Real Estate shows large negative effects across most countries. China premium is broad-based.
+\begin{frame}{Industry $\times$ Country P/E Effects}
+\centering
+\includegraphics[height=0.72\textheight]{industry_country_heatmap.pdf}
+
+\vspace{0.05cm}
+\scriptsize Country P/E effects by GICS sector. The China premium is broad-based across industries. Real estate shows large discounts in most countries.
 \end{frame}
 
 % ===================================================================
@@ -527,34 +306,30 @@ Other Asia & $+$7\% & $+$48\% & $+$50\% & $+$190\% \\
 % ===================================================================
 
 \begin{frame}{Stylized Facts}
-\footnotesize
-\begin{enumerate}\setlength\itemsep{2pt}
-\item \textbf{Country dominates valuation} --- 65\% of $R^2$ for P/E (Shapley). Extends Heston--Rouwenhorst (1994) from returns to levels.
+\small
+\begin{enumerate}\setlength\itemsep{4pt}
+\item \textbf{Country dominates P/E} --- 65\% of $R^2$ (Shapley). Extends Heston--Rouwenhorst (1994) from returns to valuation levels.
 
-\item \textbf{P/E is cleaner than M/B} --- M/B contaminated by leverage ($+$0.90***) and accounting (Japan: M/B $-$0.35 vs P/E $\approx$ 0).
+\item \textbf{P/E dispersion is diverging} --- $\times$2.7 since early 2000s, despite financial globalization.
 
-\item \textbf{Valuation dispersion is diverging} --- P/E dispersion $\times$2.7 despite financial globalization.
+\item \textbf{National savings rate predicts P/E} ($r = +0.34$, $t = 3.01$). More savings $\Rightarrow$ more capital chasing equities $\Rightarrow$ higher multiples. The only significant macro predictor.
 
-\item \textbf{Negative ROA--valuation correlation across countries} ($\rho \approx -0.4$). Within countries, the sign flips positive ($+$0.80). A Simpson's paradox driven by size conditioning.
+\item \textbf{Standard institutional variables are null} --- La Porta, financial development, GDP per capita: all insignificant.
 
-\item \textbf{National savings rate predicts P/E} ($r = +0.34$, $t = 3.01$). The only significant macro predictor. More savings $\Rightarrow$ more capital chasing equities $\Rightarrow$ higher multiples.
-
-\item \textbf{Standard institutional variables are null} --- La Porta, financial development, GDP per capita: all near zero.
+\item \textbf{High-P/E countries are less profitable} ($r = -0.41$). Consistent with a discount rate channel rather than a cash flow story.
 \end{enumerate}
 \end{frame}
 
 \begin{frame}{Research Questions}
 \small
-\begin{enumerate}\setlength\itemsep{3pt}
+\begin{enumerate}\setlength\itemsep{4pt}
 \item \textbf{Why is P/E dispersion diverging?} ($\times$2.7) --- US tech? Post-GFC monetary policy? Capital flows?
 
-\item \textbf{Can the savings channel be formalized?} --- Savings/GNI predicts P/E but is orthogonal to ROA. Can we build a model where savings rates affect discount rates and therefore valuations?
+\item \textbf{Can the savings channel be formalized?} --- Savings/GNI predicts P/E and is orthogonal to ROA. A model where savings rates affect discount rates?
 
-\item \textbf{Do low-valuation countries earn higher returns?} --- Bekaert--Harvey, Fama--French international. If so, valuation gaps reflect risk premia.
+\item \textbf{Do low-P/E countries earn higher returns?} --- Bekaert--Harvey, Fama--French international. If so, valuation gaps reflect risk premia.
 
-\item \textbf{What explains China's P/E premium?} --- Highest P/E despite moderate M/B. Retail investors? Capital controls? Savings rate (46\% of GNI)?
-
-\item \textbf{EV/EBITDA as third metric} --- avoids both the book equity issues (M/B) and the profitable-firms restriction (P/E).
+\item \textbf{What explains China's P/E premium?} --- Highest P/E among large countries. Retail investors? Capital controls? Savings rate (46\% of GNI)?
 \end{enumerate}
 \end{frame}
 
@@ -586,77 +361,51 @@ Other Asia & $+$7\% & $+$48\% & $+$50\% & $+$190\% \\
 \appendix
 \section{Appendix}
 
-\begin{frame}{Regression Specifications}
+\begin{frame}{P/E Regression Specification}
 \small
-\textbf{P/E} (profitable firms, $NI > 0$):
+\textbf{Main specification} (profitable firms, $NI > 0$):
 \vspace{-0.2cm}
-\begin{align*}
-\log(P/E)_{i,t} &= \beta_1 \text{Lev} + \beta_2 \log(\text{Assets}) + \beta_3 \Delta E_{t-1} + \gamma_c + \delta_j + \tau_t + \varepsilon_{i,t}
-\end{align*}
+$$\log(P/E)_{i,t} = \beta_1 \text{Lev} + \beta_2 \log(\text{Assets}) + \beta_3 \Delta E_{t-1} + \gamma_c + \delta_j + \tau_t + \varepsilon_{i,t}$$
 
-\vspace{-0.4cm}
-\textbf{M/B} (all firms):
-\vspace{-0.2cm}
-\begin{align*}
-\log(M/B)_{i,t} &= \beta_1 \text{ROA} + \beta_2 \text{Lev} + \beta_3 \log(\text{Assets}) + \beta_4 \Delta E_{t-1} + \text{FE} + \varepsilon_{i,t}
-\end{align*}
-
-\vspace{-0.4cm}
-\textbf{ROA}:
-\vspace{-0.2cm}
-\begin{align*}
-\text{ROA}_{i,t} &= \beta_1 \text{Lev} + \beta_2 \log(\text{Assets}) + \gamma_c + \delta_j + \tau_t + \varepsilon_{i,t}
-\end{align*}
-
-\vspace{-0.3cm}
-\footnotesize FE = $\gamma_c$ (country) + $\delta_j$ (GICS industry) + $\tau_t$ (year).
-SE clustered at country level. Spec 2: $\gamma_{c,t}$ (country$\times$year) replaces $\gamma_c + \tau_t$.
-\end{frame}
-
-\begin{frame}{P/E and M/B Regression Results}
-\vspace{-0.2cm}
-\begin{columns}[T]
-\begin{column}{0.47\textwidth}
-\centering
-\footnotesize \textbf{P/E} (profitable firms)
-
+\vspace{-0.1cm}
 \begin{tabular}{@{}lcc@{}}
 \toprule
 & Spec 1 & Spec 2 \\
 \midrule
-Leverage & $-$0.017 & $-$0.013 \\
-    & (0.102) & (0.100) \\
-$\log(\text{At})$ & $-$0.076** & $-$0.078** \\
-     & (0.030) & (0.031) \\
-Lag $\Delta E$ & $-$0.016*** & $-$0.016*** \\
-     & (0.003) & (0.003) \\
+Leverage & $-$0.017 (0.102) & $-$0.013 (0.100) \\
+$\log(\text{At})$ & $-$0.076** (0.030) & $-$0.078** (0.031) \\
+Lag $\Delta E$ & $-$0.016*** (0.003) & $-$0.016*** (0.003) \\
 \midrule
+FE & Country + Ind + Year & Country$\times$Year + Ind \\
 N / $R^2$ & 428K / 0.142 & 428K / 0.163 \\
 \bottomrule
 \end{tabular}
-\end{column}
-\begin{column}{0.47\textwidth}
-\centering
-\footnotesize \textbf{M/B} (all firms)
 
+\vspace{0.1cm}
+\footnotesize SE clustered by country. Year-by-year regressions extract $\gamma_c$ with USA = 0.
+\end{frame}
+
+\begin{frame}{Profitability Puzzle: Robustness Details}
+\footnotesize
 \begin{tabular}{@{}lcc@{}}
 \toprule
-& Spec 1 & Spec 2 \\
+\textbf{Specification} & \textbf{$r$(ROA, P/E)} & \textbf{Note} \\
 \midrule
-ROA & 0.259 & 0.225 \\
-    & (0.158) & (0.154) \\
-Leverage & 0.901*** & 0.902*** \\
-    & (0.060) & (0.063) \\
-$\log(\text{At})$ & $-$0.074*** & $-$0.077*** \\
-     & (0.027) & (0.028) \\
-\midrule
-N / $R^2$ & 593K / 0.219 & 593K / 0.246 \\
+Raw country averages & $-$0.02 & No controls \\
+Industry$\times$year demeaned & $+$0.11 & Industry removed \\
+\addlinespace
+Regression \textbf{without} industry FE & $-$0.46 & Size + leverage + earn.\ growth \\
+Regression \textbf{with} industry FE & $-$0.41 & Main specification \\
+Using lagged ROA$_{t-1}$ & $-$0.37 & Breaks mechanical link \\
+\addlinespace
+\textbf{With USD size controls:} \\
+Both P/E and ROA control for size & $-$0.64 & Strongest \\
+No size controls on either side & $-$0.02 & Disappears \\
 \bottomrule
 \end{tabular}
-\end{column}
-\end{columns}
+
 \vspace{0.1cm}
-\scriptsize Spec 1: Country + Industry + Year FE. Spec 2: Country$\times$Year + Industry FE. SE clustered by country.
+\footnotesize The negative correlation is a \textbf{Simpson's paradox}: within each size bucket, high-ROA countries have lower P/E. Without size controls, this is masked. Effect is stronger with USD-converted assets ($-$0.64 vs $-$0.51 local), ruling out a currency artifact.
 \end{frame}
 
 \begin{frame}{Market Cap Construction (Detail)}
@@ -677,7 +426,7 @@ iid=05W & HUF & 38{,}620 $\leftarrow$ \textcolor{alert}{wrong currency!} \\
 iid=06W & MXN & 2{,}009 $\leftarrow$ \textcolor{alert}{wrong currency!} \\
 \end{tabular}
 
-\item \textbf{Solution}: use \texttt{prirow} field (primary security designation) to select the correct iid
+\item \textbf{Solution}: use \texttt{prirow} field (primary security designation)
 \end{itemize}
 
 \vspace{0.05cm}
@@ -715,33 +464,10 @@ Other / missing & 0.8\% \\
 \item Korea: 99\% IFRS (since 2011)
 \end{itemize}
 
-\vspace{0.05cm}
-\footnotesize Book equity (\texttt{ceq}) particularly affected: IFRS vs.\ local GAAP differ on intangibles and fair value.
+\vspace{0.1cm}
+\footnotesize P/E is less sensitive to accounting standards than book-equity-based ratios. Country FE absorb time-invariant differences.
 \end{column}
 \end{columns}
-
-\vspace{0.05cm}
-\footnotesize Country FE absorb time-invariant accounting differences. Concern: within-country switches (EU 2005).
-\end{frame}
-
-\begin{frame}{Firm Size: Local Currency vs USD}
-\vspace{-0.25cm}
-\centering
-\includegraphics[height=0.52\textheight]{scatter_size_local_vs_usd.pdf}
-
-\vspace{-0.1cm}
-\scriptsize
-\begin{tabular}{@{}lccc@{}}
-\toprule
-& \textbf{Size vs P/E} & \textbf{Size vs ROA} & \textbf{Partial $r$(ROA, P/E $|$ size)} \\
-\midrule
-Local currency & $+$0.49 & $-$0.77 & $-$0.17 \\
-\textbf{USD-converted} & $\mathbf{+0.15}$ & $\mathbf{-0.12}$ & $\mathbf{-0.47}$ \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.05cm}
-\scriptsize Local currency: JPN $\log(at)=10.8$, KOR $12.6$, IDN $13.6$. In USD: 6.1, 5.6, 4.2. After conversion, size no longer absorbs the ROA--P/E link.
 \end{frame}
 
 \end{document}
