@@ -1,0 +1,30 @@
+======================================================================
+SIZE, ROA, AND VALUATION: COUNTRY-LEVEL ANALYSIS
+======================================================================
+
+CORRELATIONS:
+  Size vs P/E effect:   r = +0.542
+  Size vs M/B effect:   r = +0.529
+  Size vs ROA effect:   r = -0.699
+  ROA vs P/E (raw):     r = -0.502
+  ROA vs P/E (|size):   r = -0.204
+  ROA vs M/B (raw):     r = -0.532
+  ROA vs M/B (|size):   r = -0.267
+  Small share vs P/E:   r = -0.486
+
+REGRESSIONS:
+
+Spec 1: P/E ~ ROA
+  ROA: -3.013 (t=-4.57), R²=0.252
+
+Spec 2: P/E ~ ROA + avg log(Assets)
+  ROA:  -1.442 (t=-1.63)
+  Size: 0.058 (t=2.54)
+  R²=0.323
+
+Spec 3: P/E ~ ROA + small firm share
+  ROA:         -1.971 (t=-2.45)
+  Small share: -0.342 (t=-2.15)
+  R²=0.304
+
+N countries: 64

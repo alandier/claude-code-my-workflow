@@ -631,6 +631,57 @@ Earnings growth is \emph{uncorrelated} with valuations. Japan has higher growth 
 \end{frame}
 
 % ===================================================================
+\section{Firm Size and Capital Starvation}
+% ===================================================================
+
+\begin{frame}{Countries with Smaller Firms Have Higher ROA and Lower P/E}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_size_vs_roa.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_size_vs_pe.pdf}
+\end{column}
+\end{columns}
+\vspace{0.05cm}
+\footnotesize Each dot is a country. Size = average $\log(\text{Assets})$ of listed firms.
+Countries with smaller firms (capital-starved?) have \emph{higher} ROA ($r = -0.70$) yet \emph{lower} P/E ($r = +0.54$). Consistent with suboptimally small firms earning high returns on limited capital, while facing high discount rates.
+\end{frame}
+
+\begin{frame}{Firm Size Absorbs the Negative ROA--P/E Link}
+\vspace{-0.2cm}
+\begin{columns}[T]
+\begin{column}{0.51\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_roa_vs_pe_size_resid.pdf}
+\end{column}
+\begin{column}{0.46\textwidth}
+\footnotesize
+\vspace{0.1cm}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{P/E effect} & \textbf{(1)} & \textbf{(2)} & \textbf{(3)} \\
+\midrule
+ROA & $-$3.01*** & $-$1.44 & $-$1.97** \\
+    & \scriptsize($-$4.57) & \scriptsize($-$1.63) & \scriptsize($-$2.45) \\[2pt]
+Avg Size & & 0.058** & \\
+         & & \scriptsize(2.54) & \\[2pt]
+Small share & & & $-$0.34** \\
+            & & & \scriptsize($-$2.15) \\
+\midrule
+$R^2$ & .252 & .323 & .304 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.1cm}
+ROA becomes \textbf{insignificant} once avg firm size is added. Size absorbs $\sim$60\% of the negative correlation ($r$: $-$0.50 $\to$ $-$0.20).
+\end{column}
+\end{columns}
+\end{frame}
+
+% ===================================================================
 \section{Stylized Facts and Takeaways}
 % ===================================================================
 
@@ -662,7 +713,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 
 \item \textbf{Country dominates profitability too} --- for ROA, country edges industry (51\% vs 45\%).
 
-\item \textbf{Negative valuation--ROA correlation across countries} ($\rho \approx -0.4$) --- high-valuation countries are \emph{not} high-ROA countries. Earnings growth uncorrelated ($\rho \approx 0$). Points to \emph{discount rates}. Within countries, the P/E--ROA link flips positive ($+$0.80); M/B stays negative ($-$0.59, growth options).
+\item \textbf{Negative valuation--ROA correlation across countries} ($\rho \approx -0.4$) --- partly explained by firm size: countries with smaller (capital-starved?) firms have higher ROA ($r=-0.70$) but lower P/E. Controlling for avg firm size renders ROA insignificant. Within countries, P/E--ROA flips positive ($+$0.80).
 
 \item \textbf{M/B is leverage-contaminated} --- leverage coefficient $+$0.90*** in M/B, insignificant in P/E. Cross-country leverage heterogeneity (std = 0.095) mechanically inflates M/B variation.
 \end{enumerate}
@@ -721,7 +772,7 @@ Dispersion trend & $\times$2.7 & $\times$1.1 \\
 
 \item \textbf{Can we decompose the country effect?} --- Discount rates, growth expectations, investor protection, capital controls, accounting norms
 
-\item \textbf{Why are valuations negatively correlated with ROA?} ($\rho \approx -0.4$) --- Higher risk in profitable countries? Capital allocation inefficiency?
+\item \textbf{Why are valuations negatively correlated with ROA?} ($\rho \approx -0.4$) --- Firm size absorbs $\sim$60\% of the link. Capital starvation story: underdeveloped capital markets $\to$ small firms $\to$ high ROA + high discount rates. Can we link to financial development indicators?
 
 \item \textbf{Japan as natural experiment} --- P/E $\approx 0$ vs M/B $= -0.35$: can we bound the ``accounting noise'' in M/B?
 \end{enumerate}
