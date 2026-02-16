@@ -693,6 +693,31 @@ Local currency & $+$0.49 & $-$0.77 & $-$0.17 \\
 \textbf{Result}: correlation barely changes ($-$0.41 $\to$ $-$0.37). Country ROA effects are extremely persistent ($r = 0.99$), so the link reflects \emph{permanent} profitability differences, not transitory earnings.
 \end{frame}
 
+\begin{frame}{Not Industry Composition Either}
+\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Specification} & \textbf{ROA vs P/E} & \textbf{Note} \\
+\midrule
+Raw country averages & $-$0.02 & No controls \\
+Industry$\times$year demeaned & $+$0.11 & Industry removed, no other controls \\
+\addlinespace
+Regression \textbf{without} industry FE & $-$0.46 & Size + leverage + earn.\ growth \\
+Regression \textbf{with} industry FE & $-$0.41 & Our main specification \\
+\addlinespace
+Using lagged ROA$_{t-1}$ & $-$0.37 & Breaks NI$\to$P/E mechanical link \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.15cm}
+\footnotesize
+\begin{itemize}\setlength\itemsep{1pt}
+\item Industry FE slightly \emph{reduce} the correlation ($-$0.46 $\to$ $-$0.41) --- industry composition is not the driver
+\item The negative link emerges after controlling for firm size and leverage, which strip out within-country heterogeneity and reveal the pure country effect
+\item Raw correlation is near zero because composition noise masks the relationship
+\end{itemize}
+\end{frame}
+
 \begin{frame}{Nothing Absorbs the ROA--P/E Link}
 \footnotesize
 \begin{tabular}{@{}lcccc@{}}
