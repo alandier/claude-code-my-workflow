@@ -38,6 +38,7 @@
 % ===================================================================
 
 \begin{frame}{Data Sources}
+\vspace{-0.2cm}
 \begin{table}
 \centering
 \small
@@ -47,15 +48,15 @@
 \midrule
 \texttt{compustat\_global}   & 2.3 GB & 981K   & 468 & Global annual fundamentals (122 countries) \\
 \texttt{compustat\_america}  & 0.8 GB & 254K   & 984 & North America fundamentals \\
-\texttt{returns\_global}     & 1.9 GB & 10.4M  &  25 & Global monthly security prices \\
+\texttt{returns\_global}     & 1.9 GB & 10.4M  &  25 & Global monthly prices (\textbf{from 2007}) \\
 \texttt{IBES consensus}      & WRDS   & 3.1M   & --- & Analyst EPS forecasts (FY1, FY2, LTG) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\vspace{0.2cm}
-\begin{itemize}
-\item \textbf{Panel}: 743K firm-years, 81 countries (1986--2024). Forward P/E: 169K firm-years, 76 countries (2000--2024).
+\vspace{0.1cm}
+\begin{itemize}\setlength\itemsep{1pt}
+\item \textbf{Panel}: 743K firm-years, 81 countries (US from 1986, \textbf{non-US from 2007}). Forward P/E: 169K firm-years, 76 countries.
 \item \textbf{Market cap (Global)}: \texttt{cshoi} $\times$ \texttt{prccm} using \texttt{prirow} (primary security)
 \item \textbf{IBES link}: US via ICLINK/CCM; International via \texttt{comp.g\_security.ibtic}
 \end{itemize}
@@ -113,7 +114,8 @@ Leverage & 743K & 0.49 & 0.14 & 0.85 \\
 Trailing P/E: 540K obs (1986--2024)\\
 Forward P/E FY1: 169K obs (2000--2024)\\
 IBES LTG: 51K obs (2000--2024)\\
-IMF WEO growth: from 2008 only
+IMF WEO growth: from 2008 only\\[2pt]
+\textit{Non-US market cap requires \texttt{returns\_global} $\Rightarrow$ international panel starts 2007.}
 \end{column}
 \end{columns}
 \end{frame}
