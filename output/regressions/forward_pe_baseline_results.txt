@@ -1,0 +1,105 @@
+======================================================================
+FORWARD P/E BASELINE REGRESSIONS
+======================================================================
+
+--- Pooled Panel Regressions ---
+Spec                         N      R²   σ(FE)   Ctry         Years
+(1) Base               150,143   0.133   0.556     76     2000-2024
+(2) + R&D              150,143   0.136   0.548     76     2000-2024
+(3) + LTG               43,680   0.145   0.707     58     2000-2024
+(4) + Macro             20,709   0.160   0.562     33     2008-2024
+(5) FY2 + all           44,805   0.132   0.745     58     2000-2024
+
+--- Key Coefficients from Spec (3) + LTG ---
+  leverage            : -0.8164 (SE=0.1445, t=-5.65)
+  log_at              : +0.0402 (SE=0.0387, t=+1.04)
+  lag_earn_growth     : -0.0078 (SE=0.0017, t=-4.46)
+  xrd_at              : +2.4447 (SE=0.2747, t=+8.90)
+  ltg                 : +0.0126 (SE=0.0024, t=+5.21)
+
+--- Country FE (pooled, baseline spec) ---
+    CYP: -3.949 (PE ratio: 0.02)
+    IMN: -1.254 (PE ratio: 0.29)
+    MHL: -1.153 (PE ratio: 0.32)
+    KOR: -0.972 (PE ratio: 0.38)
+    JPN: -0.772 (PE ratio: 0.46)
+    ROU: -0.764 (PE ratio: 0.47)
+    ARG: -0.760 (PE ratio: 0.47)
+    CHL: -0.717 (PE ratio: 0.49)
+    ARE: -0.691 (PE ratio: 0.50)
+    VGB: -0.677 (PE ratio: 0.51)
+    PER: -0.569 (PE ratio: 0.57)
+    GRC: -0.560 (PE ratio: 0.57)
+    GGY: -0.498 (PE ratio: 0.61)
+    BMU: -0.490 (PE ratio: 0.61)
+    SGP: -0.411 (PE ratio: 0.66)
+    ZAF: -0.409 (PE ratio: 0.66)
+    PAK: -0.398 (PE ratio: 0.67)
+    TWN: -0.349 (PE ratio: 0.71)
+    CYM: -0.339 (PE ratio: 0.71)
+    IDN: -0.265 (PE ratio: 0.77)
+    FRA: -0.257 (PE ratio: 0.77)
+    AUT: -0.255 (PE ratio: 0.78)
+    AUS: -0.245 (PE ratio: 0.78)
+    HKG: -0.215 (PE ratio: 0.81)
+    ISR: -0.214 (PE ratio: 0.81)
+    MUS: -0.196 (PE ratio: 0.82)
+    PHL: -0.146 (PE ratio: 0.86)
+    NLD: -0.118 (PE ratio: 0.89)
+    BEL: -0.103 (PE ratio: 0.90)
+    POL: -0.085 (PE ratio: 0.92)
+    JEY: -0.072 (PE ratio: 0.93)
+    THA: -0.067 (PE ratio: 0.93)
+    GBR: -0.064 (PE ratio: 0.94)
+    MEX: -0.060 (PE ratio: 0.94)
+    CHN: -0.038 (PE ratio: 0.96)
+    DEU: -0.030 (PE ratio: 0.97)
+    IRL: -0.003 (PE ratio: 1.00)
+    USA: +0.000 (PE ratio: 1.00)
+    ESP: +0.006 (PE ratio: 1.01)
+    LUX: +0.018 (PE ratio: 1.02)
+    BRA: +0.074 (PE ratio: 1.08)
+    NOR: +0.076 (PE ratio: 1.08)
+    TUR: +0.078 (PE ratio: 1.08)
+    SAU: +0.116 (PE ratio: 1.12)
+    ITA: +0.116 (PE ratio: 1.12)
+    CHE: +0.123 (PE ratio: 1.13)
+    CAN: +0.129 (PE ratio: 1.14)
+    COL: +0.131 (PE ratio: 1.14)
+    SWE: +0.157 (PE ratio: 1.17)
+    FIN: +0.182 (PE ratio: 1.20)
+    IND: +0.196 (PE ratio: 1.22)
+    MYS: +0.200 (PE ratio: 1.22)
+    PRT: +0.230 (PE ratio: 1.26)
+    NZL: +0.302 (PE ratio: 1.35)
+    DNK: +0.333 (PE ratio: 1.39)
+    RUS: +0.505 (PE ratio: 1.66)
+    EGY: +1.197 (PE ratio: 3.31)
+    QAT: +1.959 (PE ratio: 7.09)
+
+--- Second-Stage Regressions ---
+
+  Savings only (n=52): R²=0.085
+    savings_gni              : +0.0236 (t=+2.16)
+
+  Fin dev (mktcap+credit) (n=46): R²=0.083
+    mktcap_gdp               : +0.0008 (t=+1.13)
+    credit_gdp               : -0.0050 (t=-1.96)
+
+  Savings + Mktcap (n=48): R²=0.076
+    savings_gni              : +0.0220 (t=+1.91)
+    mktcap_gdp               : -0.0000 (t=-0.06)
+
+  Savings + Credit (n=49): R²=0.153
+    savings_gni              : +0.0278 (t=+2.48)
+    credit_gdp               : -0.0036 (t=-1.79)
+
+  Savings + ASD (n=44): R²=0.004
+    savings_gni              : -0.0000 (t=-0.00)
+    anti_self_dealing        : -0.0989 (t=-0.38)
+
+  Kitchen sink (n=40): R²=0.006
+    savings_gni              : -0.0003 (t=-0.03)
+    mktcap_gdp               : -0.0001 (t=-0.19)
+    credit_gdp               : -0.0003 (t=-0.20)
+    anti_self_dealing        : -0.0119 (t=-0.04)
