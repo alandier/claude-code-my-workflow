@@ -56,7 +56,7 @@
 
 \vspace{0.1cm}
 \begin{itemize}\setlength\itemsep{1pt}
-\item \textbf{Panel}: 743K firm-years, 81 countries (US from 1986, \textbf{non-US from 2007}). Forward P/E: 169K firm-years, 76 countries.
+\item \textbf{Panel}: 743K firm-years, 81 countries (US from 1986; non-US: 65+ countries from 2007, $\leq$7 before). Forward P/E: 169K firm-years, 76 countries.
 \item \textbf{Market cap (Global)}: \texttt{cshoi} $\times$ \texttt{prccm} using \texttt{prirow} (primary security)
 \item \textbf{IBES link}: US via ICLINK/CCM; International via \texttt{comp.g\_security.ibtic}
 \end{itemize}
@@ -115,7 +115,7 @@ Trailing P/E: 540K obs (1986--2024)\\
 Forward P/E FY1: 169K obs (2000--2024)\\
 IBES LTG: 51K obs (2000--2024)\\
 IMF WEO growth: from 2008 only\\[2pt]
-\textit{Non-US market cap requires \texttt{returns\_global} $\Rightarrow$ international panel starts 2007.}
+\textit{Non-US market cap: $\leq$7 countries pre-2007; 65+ countries from 2007 (\texttt{returns\_global}).}
 \end{column}
 \end{columns}
 \end{frame}
