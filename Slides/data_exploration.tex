@@ -19,8 +19,8 @@
 \graphicspath{{../output/diagnostics/}{../output/regressions/}}
 
 % --- Metadata ---
-\title{Global Valuation}
-\subtitle{Cross-Country Price-Earnings Multiples}
+\title{The Cross-Country P/E Puzzle}
+\subtitle{Why Do Identical Firms Trade at Different Multiples?}
 \author{Augustin Landier}
 \institute{HEC Paris}
 \date{February 2026}
@@ -34,294 +34,411 @@
 \end{frame}
 
 % ===================================================================
-\section{Data and Sample}
+\section{Motivation}
 % ===================================================================
 
-\begin{frame}{Data Sources}
-\vspace{-0.2cm}
-\begin{table}
-\centering
-\small
-\begin{tabular}{@{}llrrp{5cm}@{}}
-\toprule
-\textbf{Source} & \textbf{Size} & \textbf{Rows} & \textbf{Cols} & \textbf{Description} \\
-\midrule
-\texttt{compustat\_global}   & 2.3 GB & 981K   & 468 & Global annual fundamentals (122 countries) \\
-\texttt{compustat\_america}  & 0.8 GB & 254K   & 984 & North America fundamentals \\
-\texttt{returns\_global}     & 1.9 GB & 10.4M  &  25 & Global monthly prices (\textbf{from 2007}) \\
-\texttt{IBES consensus}      & WRDS   & 3.1M   & --- & Analyst EPS forecasts (FY1, FY2, LTG) \\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{frame}{The Question}
+\large
 
-\vspace{0.1cm}
-\begin{itemize}\setlength\itemsep{1pt}
-\item \textbf{Panel}: 743K firm-years, 81 countries (US from 1986; non-US: 65+ countries from 2007, $\leq$7 before). Forward P/E: 169K firm-years, 76 countries.
-\item \textbf{Market cap (Global)}: \texttt{cshoi} $\times$ \texttt{prccm} using \texttt{prirow} (primary security)
-\item \textbf{IBES link}: US via ICLINK/CCM; International via \texttt{comp.g\_security.ibtic}
-\end{itemize}
-\end{frame}
+Price-earnings ratios vary dramatically across countries.
 
-\begin{frame}{Variable Definitions}
-\small
-\textbf{Gordon model motivation:}
-\vspace{-0.1cm}
-$$P/E = \frac{1}{r - g} \qquad \Rightarrow \qquad \log(P/E) = -\log(r-g) \qquad \text{\footnotesize(constant growth)}$$
+\vspace{0.3cm}
 
-\vspace{-0.15cm}
-Forward P/E uses analyst EPS forecasts $\Rightarrow$ directly captures the \textbf{discount-rate channel}.
+\textbf{How much of this is firm composition vs.\ a pure country effect?}
 
-\vspace{0.1cm}
-\footnotesize
-\begin{tabular}{@{}p{2.8cm}p{10cm}@{}}
-\textbf{Forward P/E (FY1)} & Market Cap / (IBES median FY1 EPS $\times$ shares), positive forecasts \\
-\textbf{Forward P/E (FY2)} & Same with two-year-ahead consensus \\
-\textbf{LTG} & IBES long-term growth forecast (3--5 year EPS growth, \%) \\
-\textbf{R\&D / Assets} & Firm-level intangible investment intensity \\
-\textbf{IMF growth} & WEO 5-year-ahead GDP growth forecast (country-year, from 2008) \\
-\textbf{Real rate} & World Bank real interest rate (country-year) \\
-\end{tabular}
-
-\vspace{0.1cm}
-\scriptsize All ratios winsorized at 1st/99th percentiles. IBES consensus requires $\geq$3 analysts. BPN $\div$100 for UK.
-\end{frame}
-
-\begin{frame}{Coverage and Descriptive Statistics}
-\begin{columns}[T]
-\begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{coverage_by_country.pdf}
-\end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\small
-\begin{tabular}{@{}lrrrr@{}}
-\toprule
-Variable & N & Median & P10 & P90 \\
-\midrule
-$\log(\text{P/E})$ & 532K & 2.79 & 1.76 & 4.32 \\
-ROA & 743K & 0.02 & $-$0.15 & 0.11 \\
-Leverage & 743K & 0.49 & 0.14 & 0.85 \\
-\bottomrule
-\end{tabular}
+\vspace{0.3cm}
+\normalsize
+Gordon model: \quad $P/E = \dfrac{1}{r - g}$
 
 \vspace{0.15cm}
+\begin{itemize}\setlength\itemsep{4pt}
+\item Forward P/E uses analyst EPS forecasts $\Rightarrow$ expected growth is controlled
+\item Residual country effects must reflect \textbf{discount rates} or \textbf{model misspecification}
+\item We also measure expected returns directly (analyst price targets)
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{Approach:} We use 200K firm-years across 100+ countries to decompose cross-country P/E differences into discount rate and growth components.
+\end{frame}
+
+\begin{frame}{The Puzzle in One Picture}
+\centering
+\includegraphics[height=0.62\textheight]{country_effects_forward_baseline.pdf}
+
+\vspace{0.05cm}
+\scriptsize Market-cap-weighted regional aggregates. Year-by-year regressions controlling for firm size, leverage, R\&D, growth, and 2-digit SIC industry. USA $= 1.0$.
+
+\vspace{0.05cm}
+\normalsize
+\textbf{Europe has traded at a 10--30\% P/E discount to the US for 25 years.}
+\end{frame}
+
+% ===================================================================
+\section{Data}
+% ===================================================================
+
+\begin{frame}{Coverage: 200K Firm-Years, 100+ Countries}
+\vspace{-0.1cm}
 \footnotesize
-\textbf{Top 5 by obs:} USA (188K), JPN (60K), CHN (58K), IND (57K), TWN (31K).
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\renewcommand{\arraystretch}{0.92}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& \textbf{Forward P/E} & \textbf{Exp.\ Return} & \textbf{LTG} \\
+\midrule
+\textbf{Firm-years} & 200K & 193K & 56K \\
+\textbf{Countries} & 102 & 103 & 68 \\
+\textbf{Years} & 2000--2025 & 2000--2025 & 2000--2025 \\
+\textbf{Firms/year} & 6K--9K & 6K--9K & 2K--3K \\
+\bottomrule
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
+
+\vspace{0.15cm}
+\textbf{Key variables:}
+\begin{tabular}{@{}lp{4.8cm}@{}}
+Forward P/E & IBES price / FY1 EPS consensus \\
+Expected return & Price target / price $-$ 1 \\
+MTG & (EPS$_{\text{FY2}}$ $-$ EPS$_{\text{FY1}}$) / $|\overline{\text{EPS}}|$ \\
+\end{tabular}
 
 \vspace{0.1cm}
-\textbf{Data availability:}\\
-Trailing P/E: 540K obs (1986--2024)\\
-Forward P/E FY1: 169K obs (2000--2024)\\
-IBES LTG: 51K obs (2000--2024)\\
-IMF WEO growth: from 2008 only\\[2pt]
-\textit{Non-US market cap: $\leq$7 countries pre-2007; 65+ countries from 2007 (\texttt{returns\_global}).}
+\textbf{Top 10:} USA 84K, JPN 31K, GBR 14K, CAN 9K, AUS 8K, IND 7K, CHN 4K, FRA 4K, DEU 4K, KOR 4K
+\end{column}
+\begin{column}{0.41\textwidth}
+\vspace{0.1cm}
+\small
+\textbf{Key advantage:} no market cap required.
+
+\vspace{0.1cm}
+\footnotesize
+Forward P/E = IBES price / IBES EPS forecast, both in same IBES currency $\Rightarrow$ no FX or market cap needed.
+
+\vspace{0.15cm}
+Non-US coverage from 2000 (60--80 countries), not just from 2007.
+
+\vspace{0.15cm}
+\scriptsize
+P/E winsorized at 1/99\%. Expected return at 2.5/97.5\%.\\
+All regressions use $\log(\text{P/E})$.\\
+$\geq$3 analysts required for consensus.\\
+FE: Country$\times$Year + SIC2$\times$Year throughout.
 \end{column}
 \end{columns}
 \end{frame}
 
 % ===================================================================
-\section{Firm-Level Regressions}
+\section{Country P/E Effects Are Large}
 % ===================================================================
 
-\begin{frame}{Panel Regression: Forward P/E with Progressive Controls}
-\vspace{-0.4cm}
+\begin{frame}{Firm-Level Panel: Forward P/E with Progressive Controls}
+\vspace{-0.5cm}
 \scriptsize
-\textbf{Dep.\ variable:} $\log(\text{Forward P/E FY1})_{i,t}$ \quad (positive analyst forecasts)
+\textbf{Dep.\ var:} $\log(\text{Forward P/E FY1})_{i,t}$. \quad Country$\times$Year + SIC2$\times$Year FE. \quad SE clustered by country.
 
-\vspace{0.05cm}
-\renewcommand{\arraystretch}{0.95}
+\vspace{-0.05cm}
+\renewcommand{\arraystretch}{0.82}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-& \textbf{(1)} & \textbf{(2)} & \textbf{(3)} & \textbf{(4)} \\
-& Base & + R\&D & + LTG & + Macro \\
+& \textbf{(A)} & \textbf{(B)} & \textbf{(C)} & \textbf{(C$'$)} \\
+& Base & + R\&D & + MTG & + LTG \\
 \midrule
-Leverage & $-$0.67*** (0.11) & $-$0.65*** (0.11) & $-$0.82*** (0.14) & $-$0.93*** (0.17) \\
-$\log(\text{Assets})$ & $+$0.00 (0.03) & $+$0.01 (0.03) & $+$0.04 (0.04) & $+$0.06 (0.06) \\
-Lag $\Delta$E & $-$0.01*** & $-$0.01*** & $-$0.01*** & $-$0.01 \\
-R\&D / Assets & & $+$1.73*** (0.44) & $+$2.44*** (0.27) & $+$3.49*** (0.42) \\
-IBES LTG (\%) & & & $+$0.013*** (0.002) & $+$0.012*** (0.002) \\
-Real int.\ rate & & & & $+$0.004 (0.01) \\
-IMF growth 5y & & & & $+$0.083* (0.05) \\
+Leverage & $-$0.12* & $-$0.10* & $-$0.18* & $-$0.32*** \\
+$\log(\text{Assets})$ & $-$0.04*** & $-$0.03** & $-$0.01 & $-$0.03*** \\
+Lag $\Delta$E & $-$0.003** & $-$0.002* & $+$0.001 & $-$0.005*** \\
+R\&D / Assets & & $+$2.14*** & $+$1.86*** & $+$1.88*** \\
+MTG (FY2$-$FY1) & & & $+$1.17*** & \\
+IBES LTG (\%) & & & & $+$0.011*** \\
 \midrule
-$N$ / $R^2$ & 150K / 0.13 & 150K / 0.14 & 44K / 0.15 & 21K / 0.16 \\
-$\sigma(\hat\gamma_c)$ / Ctry & 0.56 / 76 & 0.55 / 76 & \textbf{0.71} / 58 & 0.56 / 33 \\
+$N$ & 197K & 197K & 189K & 52K \\
+$R^2$ & 0.28 & 0.29 & \textbf{0.53} & 0.37 \\
+Countries & 102 & 102 & 101 & 70 \\
+$\sigma(\hat\gamma_c)$ & \textcolor{alert}{\textbf{0.36}} & \textcolor{alert}{\textbf{0.36}} & \textcolor{alert}{\textbf{0.34}} & \textcolor{alert}{\textbf{0.35}} \\
 \bottomrule
 \end{tabular}
 \renewcommand{\arraystretch}{1.0}
 
 \vspace{0.05cm}
-\scriptsize SE clustered by country. All specs: Country + Industry + Year FE. LTG and R\&D strongly priced. Real rate \textbf{null}; IMF growth marginal. Country effects \textbf{persist} ($\sigma = 0.71$).
+\scriptsize
+\textbf{Key:} MTG doubles $R^2$ (0.29 $\to$ 0.53) but $\sigma(\hat\gamma_c)$ barely moves (0.36 $\to$ 0.34). Growth expectations explain \emph{within}-country P/E variation, not \emph{between}-country differences.
 \end{frame}
 
-\begin{frame}{Variance Decomposition: Country vs Industry vs Year}
+\begin{frame}{What Does $\sigma(\hat\gamma_c) = 0.34$ Mean?}
+\vspace{-0.1cm}
 \begin{columns}[T]
 \begin{column}{0.48\textwidth}
-\centering
-\includegraphics[width=0.95\textwidth]{variance_decomposition.pdf}
-\end{column}
-\begin{column}{0.48\textwidth}
-\small
-\textbf{Shapley $R^2$ decomposition of $\log(\text{P/E})$:}
+\footnotesize
+\textbf{In economic terms:}
+\vspace{0.1cm}
+
+$\sigma = 0.34$ in $\log(P/E)$ $\approx$ \textcolor{alert}{\textbf{40\% P/E premium}} for a one-$\sigma$ country.
 
 \vspace{0.15cm}
-\begin{tabular}{@{}lr@{}}
+\textbf{Concrete examples} (vs.\ USA $= 1$):
+\renewcommand{\arraystretch}{0.90}
+\begin{tabular}{@{}lcc@{}}
 \toprule
-\textbf{Factor} & \textbf{Share of $R^2$} \\
+Country & P/E ratio & ER gap \\
 \midrule
-Country & \textbf{64.6\%} \\
-Industry & 24.8\% \\
-Year & 10.6\% \\
+Korea & \textcolor{alert}{$0.61\times$} & $+$33pp \\
+UK & $0.79\times$ & $+$2pp \\
+France & $0.81\times$ & $\approx 0$ \\
+Germany & $0.85\times$ & $+$1pp \\
+India & $0.90\times$ & $+$12pp \\
+Japan & $1.03\times$ & $+$11pp \\
+China & $1.05\times$ & $+$6pp \\
 \bottomrule
 \end{tabular}
-
-\vspace{0.2cm}
-Country alone explains nearly two-thirds of the variation in P/E.
+\renewcommand{\arraystretch}{1.0}
+\end{column}
+\begin{column}{0.48\textwidth}
+\footnotesize
+\textbf{Comparison: Country vs.\ Industry}
 
 \vspace{0.1cm}
-Extends Heston--Rouwenhorst (1994) from \emph{returns} to \emph{valuation levels}.
-\end{column}
-\end{columns}
-\end{frame}
-
-% ===================================================================
-\section{Country Effects Are Large and Persistent}
-% ===================================================================
-
-\begin{frame}{Country Forward P/E Effects Over Time (vs USA)}
-\centering
-\includegraphics[height=0.65\textheight]{country_effects_forward_baseline.pdf}
-
-\vspace{0.05cm}
-\scriptsize Year-by-year regressions with size, leverage, earnings growth, R\&D, analyst LTG, industry FE. USA = 0.
-Japan and Korea: persistent discount. India rising. China volatile but near zero after LTG control.
-\end{frame}
-
-\begin{frame}{Forward P/E Dispersion Is Diverging}
-\begin{columns}[T]
-\begin{column}{0.55\textwidth}
-\centering
-\includegraphics[width=\textwidth]{dispersion_forward_baseline.pdf}
-\end{column}
-\begin{column}{0.42\textwidth}
-\vspace{0.2cm}
-\textbf{Forward P/E dispersion:}
-$$\sigma(\hat\gamma_c) \approx 0.4\text{--}1.0$$
-
-\vspace{0.1cm}
-Forward P/E shows \textbf{larger} cross-country dispersion than trailing P/E throughout.
+\renewcommand{\arraystretch}{0.95}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{FE Structure} & $R^2$ \\
+\midrule
+SIC2 (Industry) & 0.08 \\
+Country & 0.09 \\
+SIC2$\times$Year & 0.15 \\
+Country$\times$Year & 0.17 \\
+\midrule
+Both (baseline) & \textbf{0.28} \\
+$+$ Firm controls & \textbf{0.53} \\
+\bottomrule
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
 
 \vspace{0.15cm}
-\small Removing expected earnings differences \emph{widens} country gaps.
+Country effects are \textbf{as large as industry effects}.
 
 \vspace{0.1cm}
-$\Rightarrow$ Country P/E gaps reflect \textbf{discount rates}, not earnings expectations.
+Country$\times$Year FE add \textbf{12pp} beyond SIC2$\times$Year, of which 5pp is time-varying.
 \end{column}
 \end{columns}
 \end{frame}
 
+{
+\setbeamercolor{background canvas}{bg=primary}
+\begin{frame}[standout]
+\large Country P/E effects are as large as industry effects\\
+and firm controls barely shrink them.\\[0.5cm]
+\normalsize Can discount rates or growth expectations explain this?
+\end{frame}
+}
+
 % ===================================================================
-\section{What Explains Residual Country Effects?}
+\section{Decomposition: Discount Rate vs.\ Growth}
 % ===================================================================
 
-\begin{frame}{Cross-Country Regressions: Forward P/E Effects}
-\vspace{-0.4cm}
+\begin{frame}{Expected Return Regressions: The Discount-Rate Side}
+\vspace{-0.3cm}
 \scriptsize
-\textbf{Dep.\ variable:} country forward P/E effect $\hat\gamma_c$ (log scale, USA = 0, from pooled regression with all firm-level controls)
+\textbf{Dep.\ var:} Expected return $= \text{Price target} / \text{Price} - 1$. \quad Country$\times$Year + SIC2$\times$Year FE. \quad SE clustered by country.
 
 \vspace{0.05cm}
 \renewcommand{\arraystretch}{0.92}
-\begin{tabular}{@{}lccccc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
-& \textbf{(1)} & \textbf{(2)} & \textbf{(3)} & \textbf{(4)} & \textbf{(5)} \\
+& \textbf{(A)} & \textbf{(B)} & \textbf{(C$'$)} \\
+& Base + MTG & + R\&D & + LTG \\
 \midrule
-Savings / GNI & $+$0.024** & & $+$0.022* & $+$0.028** & \\
-& (2.16) & & (1.91) & (2.48) & \\
-Mkt Cap / GDP & & $+$0.001 & $-$0.000 & & \\
-& & (1.13) & ($-$0.06) & & \\
-Credit / GDP & & $-$0.005* & & $-$0.004* & \\
-& & ($-$1.96) & & ($-$1.79) & \\
-Anti-Self-Dealing & & & & & $-$0.099 \\
-& & & & & ($-$0.38) \\
+Leverage & $+$0.05* & $+$0.05* & $+$0.10*** \\
+$\log(\text{Assets})$ & $-$0.02*** & $-$0.02*** & $-$0.01*** \\
+Lag $\Delta$E & $-$0.003*** & $-$0.003*** & $-$0.006*** \\
+MTG (FY2$-$FY1) & $-$0.03** & $-$0.03** & \\
+R\&D / Assets & & $+$0.07 & $+$0.44*** \\
+IBES LTG (\%) & & & $+$0.002*** \\
 \midrule
-$R^2$ & 0.09 & 0.08 & 0.08 & \textbf{0.15} & 0.00 \\
-$N$ & 52 & 46 & 48 & 49 & 44 \\
+$N$ & 162K & 162K & 51K \\
+$R^2$ & 0.29 & 0.29 & 0.35 \\
+Countries & 100 & 100 & 68 \\
+$\sigma(\hat\gamma_c)$ & \textbf{0.16} & \textbf{0.16} & \textbf{0.09} \\
 \bottomrule
 \end{tabular}
 \renewcommand{\arraystretch}{1.0}
 
-\vspace{0.02cm}
-\scriptsize OLS $t$-statistics in parentheses. *$p<0.10$, **$p<0.05$, ***$p<0.01$.
-Savings/GNI: modest positive predictor ($r = +0.29$). Financial development variables: null. Residual country effects remain \textbf{largely unexplained}.
+\vspace{0.05cm}
+\scriptsize
+\textbf{Signs consistent with risk pricing:} leverage $\uparrow$ ER, size $\downarrow$ ER. Country ER effects ($\sigma = 0.16$) are large but \textbf{much smaller} than P/E effects ($\sigma = 0.34$). Korea $+$33pp, Japan $+$11pp, India $+$12pp vs USA.
 \end{frame}
 
-\begin{frame}{National Savings and Forward P/E}
+\begin{frame}{How Much Do Expected Returns and Growth Explain?}
+\vspace{-0.2cm}
 \begin{columns}[T]
-\begin{column}{0.52\textwidth}
+\begin{column}{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{scatter_savings_vs_residual_fe.pdf}
+\includegraphics[width=\textwidth]{decomposition_sigma_fe.pdf}
 \end{column}
-\begin{column}{0.45\textwidth}
-\small
-\vspace{-0.1cm}
-\textbf{Gross savings / GNI} vs forward P/E country effect:
-
-\vspace{0.15cm}
-$r = +0.29$, \; $t = 2.16$** \; ($n = 52$)
-
-\vspace{0.15cm}
+\begin{column}{0.48\textwidth}
 \footnotesize
-After controlling for all firm-level variables (R\&D, LTG, leverage, size, earnings growth) + industry + year FE.
+\textbf{Gordon model:} \, $P/E = 1/(r-g)$
+$$\log(P/E) \approx -r + g$$
+
+\vspace{-0.1cm}
+Expected return (PTG/P$-$1) proxies for $r$. MTG proxies for $g$.
 
 \vspace{0.1cm}
-\textbf{Demand-side channel}: more capital seeking equity returns $\Rightarrow$ higher price multiples.
+\textbf{Decomposition of $\sigma(\hat\gamma_c)$:}
+\begin{itemize}\setlength\itemsep{1pt}
+\item Expected return absorbs \textbf{14\%}
+\item MTG absorbs \textbf{6\%}
+\item Both absorb \textbf{16\%} (overlap: not additive)
+\end{itemize}
 
 \vspace{0.1cm}
-But $R^2 = 0.09$ --- savings explains $<$10\% of residual country effects.
+\fcolorbox{alert!50}{alert!15}{\parbox{0.9\linewidth}{\footnotesize $\Rightarrow$ \textbf{84\% of P/E dispersion unexplained.}}}
+
+\vspace{0.05cm}
+\scriptsize exp\_ret: $-$0.61 ($t=-20.8$); MTG: $+$1.16 ($t=+46.9$)
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}{Financial Development Does Not Predict Forward P/E}
-\vspace{-0.3cm}
+\begin{frame}{P/E vs.\ Expected Return Across Countries}
+\vspace{-0.2cm}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
 \centering
-\includegraphics[height=0.72\textheight]{scatter_findev_vs_residual_fe.pdf}
-
+\includegraphics[width=\textwidth]{scatter_pe_vs_expret.pdf}
+\end{column}
+\begin{column}{0.45\textwidth}
+\footnotesize
 \vspace{-0.1cm}
-\scriptsize Market cap/GDP ($r=+0.03$), credit/GDP ($r=-0.20$), anti-self-dealing ($r=-0.06$), GDP per capita ($r=+0.19$): all near zero or wrong-signed. La Porta et al.\ (2002) variables do not explain valuation levels after firm-level controls.
+
+Time-averaged country FE\\(USA $= 0$ for ER, $= 1$ for P/E).
+
+\vspace{0.1cm}
+$r = -0.57$, \; $t = -5.50$, \; $n = 66$
+
+\vspace{0.1cm}
+\textbf{Strong negative correlation} --- the right direction and \textbf{highly significant}.
+
+\vspace{0.1cm}
+\scriptsize
+\textbf{Notable:}
+\begin{itemize}\setlength\itemsep{0pt}
+\item Korea: highest ER, lowest P/E
+\item Japan, China: high P/E, moderate ER
+\item France, Germany, UK: low P/E, near-zero ER
+\end{itemize}
+
+\vspace{0.05cm}
+Yet ER absorbs only 14\% of $\sigma(\hat\gamma_c)$.
+
+\vspace{0.05cm}
+\textbf{Why?} Analyst bias may understate true ER differences. Or the gap is not about discount rates at all.
+\end{column}
+\end{columns}
 \end{frame}
 
 % ===================================================================
-\section{Summary and Next Steps}
+\section{Persistence and Cross-Country Predictors}
 % ===================================================================
 
-\begin{frame}{Stylized Facts}
-\small
-\begin{enumerate}\setlength\itemsep{0pt}
-\item \textbf{Country dominates P/E} --- 64.6\% of $R^2$ (Shapley), after controlling for size, leverage, earnings growth, industry.
+\begin{frame}{Expected Return: Regional Effects Over Time}
+\centering
+\includegraphics[height=0.68\textheight]{country_effects_expret.pdf}
 
-\item \textbf{Forward P/E widens country gaps} --- Removing expected earnings increases dispersion. Country effects reflect \textbf{discount rates}, not earnings.
+\vspace{0.05cm}
+\scriptsize Market-cap-weighted regional aggregates. Year-by-year regressions (firm controls + 2-digit SIC industry FE). USA $= 0$.
+Asia ex-China: persistently $+$10--30pp above USA. Europe: near zero. America (ex-USA): close to USA.
+\end{frame}
 
-\item \textbf{Large and persistent} --- $\sigma(\hat\gamma_c) \approx 0.7$ even after R\&D, LTG, macro controls. Japan trades at 0.46$\times$ USA forward P/E. India at 1.22$\times$.
+\begin{frame}{Cross-Country Dispersion Over Time}
+\centering
+\includegraphics[height=0.72\textheight]{dispersion_forward_baseline.pdf}
 
-\item \textbf{Real interest rate: null} --- Cross-country real rates do not predict forward P/E ($t = 0.49$). IMF growth forecasts marginal ($t = 1.72$). Consistent with the ``stock-yield disconnect'' (Gormsen--Lazarus 2026).
+\vspace{0.05cm}
+\scriptsize $\sigma$ of country effects across countries in each year. Dispersion in both P/E and expected return is substantial and persistent --- not converging.
+\end{frame}
 
-\item \textbf{Savings: modest predictor} --- Savings/GNI predicts forward P/E ($r = +0.29$), but financial development variables (investor protection, market depth) are null.
+\begin{frame}{What Predicts the Country P/E Effect?}
+\vspace{-0.2cm}
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_crosscountry_vs_pe.pdf}
+\end{column}
+\begin{column}{0.45\textwidth}
+\footnotesize
+\vspace{-0.1cm}
+
+\textbf{Dep.\ var:} country P/E effect $\hat\gamma_c$\\
+(time-averaged, USA $= 1$, 66 ctry)
+
+\vspace{0.1cm}
+\renewcommand{\arraystretch}{0.90}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Predictor} & $r$ & $t$ & $n$ \\
+\midrule
+\textbf{Mkt Cap / GDP} & $+$\textbf{0.48} & \textbf{3.96} & 55 \\
+\textbf{Credit / GDP} & $+$\textbf{0.39} & \textbf{3.20} & 58 \\
+\textbf{log(GDP/cap)} & $+$\textbf{0.33} & \textbf{2.69} & 62 \\
+\textbf{Savings / GNI} & $+$\textbf{0.29} & \textbf{2.28} & 60 \\
+\midrule
+Anti-Self-Dealing & $+$0.24 & 1.69 & 49 \\
+\bottomrule
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
+
+\vspace{0.1cm}
+\scriptsize
+Financial development and income predict P/E. Standard governance variables (anti-self-dealing) do \textbf{not}, contrary to La Porta et al.\ (2002).
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{France and Germany: A Growing P/E Discount}
+\centering
+\includegraphics[height=0.68\textheight]{trajectory_fra_deu.pdf}
+
+\vspace{0.05cm}
+\scriptsize
+Saturated year-by-year regressions (size, leverage, R\&D, MTG, 2-digit SIC industry FE). USA $= 1.0$.
+France and Germany: from parity (2000) to $0.6$--$0.73\times$ (2024). \textbf{The discount is widening, not closing.}
+\end{frame}
+
+% ===================================================================
+\section{Summary}
+% ===================================================================
+
+\begin{frame}{Three Facts About Cross-Country P/E}
+\vspace{0.1cm}
+\begin{enumerate}\setlength\itemsep{8pt}
+
+\item[\textcolor{accent}{\Large 1.}] {\large \textbf{Country effects are as large as industry effects.}}\\[2pt]
+\footnotesize After controlling for firm size, leverage, R\&D, and growth with Country$\times$Year + SIC2$\times$Year FE: $\sigma(\hat\gamma_c) = 0.34$ in $\log(P/E)$, equivalent to a \textcolor{alert}{\textbf{40\% P/E premium}} per standard deviation. Europe trades at 0.7--0.9$\times$ USA for 25 years. The gap is \textbf{widening}.
+
+\item[\textcolor{accent}{\Large 2.}] {\large \textbf{Discount rates go in the right direction but explain little.}}\\[2pt]
+\footnotesize P/E and expected return FE correlate strongly ($r = -0.57$), but ER absorbs only \textcolor{alert}{\textbf{14\%}} of $\sigma(\hat\gamma_c)$. Growth expectations absorb 6\%. Together, 16\%.
+
+\item[\textcolor{accent}{\Large 3.}] {\large \textbf{Financial development predicts the gap. Governance does not.}}\\[2pt]
+\footnotesize Mkt cap/GDP ($r = 0.48$), credit/GDP ($r = 0.39$), and log GDP/cap ($r = 0.33$) predict higher P/E. Anti-self-dealing is null ($t = 1.7$), contrary to La Porta et al.\ (2002).
+
 \end{enumerate}
+
+\vspace{0.15cm}
+\centering
+\colorbox{alert!15}{\footnotesize \textbf{84\% of cross-country P/E variation remains unexplained.}}
 \end{frame}
 
 \begin{frame}{Research Questions}
 \small
-\begin{enumerate}\setlength\itemsep{1pt}
-\item \textbf{What drives the forward P/E discount-rate gap?} --- After controlling for firm-level growth, R\&D, and risk proxies, large country effects remain. What are we missing?
+\begin{enumerate}\setlength\itemsep{2pt}
+\item \textbf{What is the missing factor?}\\
+{\footnotesize Persistent country effects unexplained by firm characteristics, growth, or risk. Behavioral? Cultural? Tax? Liquidity?}
 
-\item \textbf{Can the savings channel be formalized?} --- Savings/GNI is the best cross-sectional predictor. A model where savings rates affect discount rates?
+\item \textbf{Do analyst expected returns predict realized returns?}\\
+{\footnotesize High analyst ER $\Rightarrow$ high realized returns = risk-based. Otherwise = behavioral.}
 
-\item \textbf{Do low-P/E countries earn higher returns?} --- If so, valuation gaps reflect risk premia. Expected-returns test using Fama--French international factors.
-
-\item \textbf{Pure discounting decomposition} --- Gormsen--Lazarus (2026): can their ``pure discounting'' component explain cross-country forward P/E?
-
-\item \textbf{Why is Japan so cheap?} --- Forward P/E at 0.46$\times$ USA even after analyst growth controls. Korea even lower (0.38$\times$). Cultural, governance, or measurement?
+\item \textbf{Does the ``Korea discount'' reflect governance?}\\
+{\footnotesize Korea: P/E $0.61\times$, ER $+$33pp. Classical governance story, but anti-self-dealing index is null ($t = 1.7$).}
 \end{enumerate}
 \end{frame}
 
@@ -331,29 +448,24 @@ But $R^2 = 0.09$ --- savings explains $<$10\% of residual country effects.
 \textbf{Country vs industry effects:}
 \vspace{-0.1cm}
 \begin{itemize}\setlength{\itemsep}{-2pt}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}
-\item Heston--Rouwenhorst (1994) --- country dominates returns. We extend to \emph{levels}.
+\item Heston--Rouwenhorst (1994) --- country dominates returns. We extend to \emph{valuation levels}.
 \item Griffin--Karolyi (1998) --- industry effects vary across sectors.
 \end{itemize}
 \vspace{-0.1cm}
-\textbf{Institutions and investor protection:}
+\textbf{Institutions and cost of capital:}
 \vspace{-0.1cm}
 \begin{itemize}\setlength{\itemsep}{-2pt}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}
-\item La Porta et al.\ (2002) --- investor protection raises Tobin's Q. Weak for forward P/E.
-\item Hail--Leuz (2006) --- institutions reduce cost of equity by up to 200 basis points.
+\item La Porta et al.\ (2002) --- investor protection raises Tobin's Q. We find: \textbf{null for forward P/E}.
+\item Djankov et al.\ (2008) --- anti-self-dealing index. \textbf{Null} as P/E predictor ($t = 1.7$).
+\item Hail--Leuz (2006) --- institutions reduce cost of equity. Our expected return evidence is mixed.
 \item Stulz (2005) --- ``twin agency problems'' prevent equalization.
 \end{itemize}
 \vspace{-0.1cm}
-\textbf{Savings and asset prices:}
+\textbf{Analyst forecasts and pricing:}
 \vspace{-0.1cm}
 \begin{itemize}\setlength{\itemsep}{-2pt}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}
-\item Abel (2003) --- baby boomers' saving and asset prices.
-\item Caballero et al.\ (2008) --- global imbalances and asset price inflation.
-\end{itemize}
-\vspace{-0.1cm}
-\textbf{Interest rates and equity valuations:}
-\vspace{-0.1cm}
-\begin{itemize}\setlength{\itemsep}{-2pt}\setlength{\parsep}{0pt}\setlength{\topsep}{0pt}
-\item Gormsen--Lazarus (2026) --- ``stock-yield disconnect'': only ``pure discounting'' passes through to equities.
+\item Da--Warachka (2011) --- analyst forecasts and the cross-section of expected returns.
+\item Bradshaw et al.\ (2012) --- analysts' forecasts reflect risk differentials.
 \end{itemize}
 \end{frame}
 
@@ -363,88 +475,130 @@ But $R^2 = 0.09$ --- savings explains $<$10\% of residual country effects.
 \appendix
 \section{Appendix}
 
-\begin{frame}{Full List of Tested Predictors}
-\vspace{-0.4cm}
+\begin{frame}{Data Sources and Construction}
+\vspace{-0.3cm}
 \scriptsize
-\renewcommand{\arraystretch}{0.92}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}llp{7.5cm}@{}}
 \toprule
-\textbf{Variable} & \textbf{$r$ (trailing)} & \textbf{$t$-stat} & \textbf{$N$} \\
+\textbf{Source} & \textbf{Obs} & \textbf{Description} \\
 \midrule
-\textbf{IBES Long-Term Growth} & $\mathbf{+0.50}$*** & $\mathbf{3.48}$ & 39 \\
-\textbf{R\&D / Assets} & $\mathbf{+0.48}$*** & $\mathbf{4.73}$ & 76 \\
-\textbf{Savings / GNI} & $\mathbf{+0.34}$*** & $\mathbf{3.13}$ & 68 \\
-\addlinespace
-ROA ($-$0.08 after R\&D ctrl) & $-$0.39 & $-$3.75 & 76 \\
-WHT (n.s.\ after R\&D ctrl) & $+$0.38** & 2.85 & 51 \\
-Lending Rate & $-$0.33* & $-$2.00 & 34 \\
-Combined Dividend Tax & $+$0.25* & 1.82 & 50 \\
-Private Credit / GDP & $+$0.17 & 1.30 & 72 \\
-CIT Rate & $+$0.16 & 1.17 & 51 \\
-IMF GDP growth forecast & $+$0.13 & 1.07 & 73 \\
-Anti-Self-Dealing Index & $+$0.13 & 0.92 & 52 \\
-CapEx / Assets & $+$0.03 & 0.24 & 78 \\
-GDP per capita (PPP) & $+$0.01 & 0.09 & 73 \\
-Real Interest Rate & $-$0.03 & $-$0.15 & 34 \\
-Realized earnings growth & $-$0.00 & $-$0.04 & 80 \\
+Compustat Global + NA & 1.2M & Annual fundamentals: assets, debt, earnings, R\&D, SIC industry \\
+IBES Summary (FY1/FY2) & 3.1M & Median analyst EPS forecast ($\geq$3 analysts) \\
+IBES Panel Summary & 5.4M & Prices contemporaneous with consensus \\
+IBES Price Targets & 3.2M & Median analyst 12-month price target \\
+IBES Long-Term Growth & 507K & Consensus long-term EPS growth forecast (\%) \\
+\midrule
+OECD STES + BIS & 1.6K & 10Y govt bond yield (47 ctry) + policy rate gap-fill (10 ctry) \\
+World Bank & 5.7K & CPI inflation rate; 241 countries, 2000--2025 \\
+IMF WEO & 3.4K & 5-year GDP growth forecast; 196 countries, 2008--2026 \\
+World Bank (cross-sec.) & varies & Savings/GNI, mkt cap/GDP, credit/GDP, GDP/cap PPP \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.05cm}
+\textbf{Key measurement choices:}
+\begin{itemize}\setlength\itemsep{0pt}
+\item Forward P/E = IBES price / IBES EPS forecast (same currency $\Rightarrow$ \textbf{currency-invariant})
+\item Expected return = Price target / Price $-$ 1 (from \texttt{ptgsum} / \texttt{pansum})
+\item Consensus and price contemporaneous at \texttt{statpers}; latest before fiscal year end
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Variable Definitions}
+\vspace{-0.5cm}
+\tiny
+\renewcommand{\arraystretch}{0.75}
+\begin{tabular}{@{}p{2.2cm}p{5.5cm}p{2.0cm}p{2.0cm}@{}}
+\toprule
+\textbf{Variable} & \textbf{Construction} & \textbf{Coverage} & \textbf{Source} \\
+\midrule
+\multicolumn{4}{@{}l}{\tiny\textit{Firm-level (panel)}} \\
+Forward P/E & IBES price / FY1 EPS consensus & 200K, 102 ctry & IBES \\
+Expected return & Price target / price $-$ 1 & 193K, 103 ctry & IBES \\
+LTG & Consensus long-term EPS growth (\%) & 56K, 68 ctry & IBES \\
+Leverage & (Long-term + short-term debt) / assets & 197K & Compustat \\
+R\&D / Assets & R\&D expense / total assets (0 if missing) & 197K & Compustat \\
+SIC2 Industry & 2-digit SIC (e.g.\ 20=Food, 35=Machinery, 73=Business Services) & 88\%, 74 industries & Compustat \\
+\midrule
+\multicolumn{4}{@{}l}{\tiny\textit{Country $\times$ year (macro panel)}} \\
+Bond yield 10y & 10Y govt bond (OECD, 47 ctry) + BIS policy rate (10 ctry) & 57 ctry & OECD + BIS \\
+Inflation & CPI inflation rate, annual \% (YoY) & 241 ctry & World Bank \\
+IMF growth 5y & Avg 5yr-ahead real GDP growth forecast & 196 ctry & WEO vintages \\
+\midrule
+\multicolumn{4}{@{}l}{\tiny\textit{Cross-sectional (time-averaged)}} \\
+Savings / GNI & Gross national savings / GNI (2005--23) & 214 ctry & World Bank \\
+Mkt Cap / GDP & Stock market capitalization / GDP (2010--23) & 129 ctry & World Bank \\
+Credit / GDP & Private credit / GDP (2010--23) & 232 ctry & World Bank \\
+Anti-Self-Dealing & Index (0--1), anti-self-dealing protection & 46 ctry & Djankov (2008) \\
 \bottomrule
 \end{tabular}
 \renewcommand{\arraystretch}{1.0}
-
-\vspace{-0.1cm}
-\scriptsize Sorted by $|r|$. Based on \emph{trailing} P/E country effects (base regression, not forward P/E). ROA and WHT absorbed by R\&D.
 \end{frame}
 
-\begin{frame}{IBES Merge and Coverage Details}
-\small
-\textbf{Linking strategy:}
-\begin{itemize}\setlength\itemsep{0pt}
-\item US: ICLINK (\texttt{wrdsapps.ibcrsphist}) $\to$ CCM (\texttt{crsp.ccmxpf\_lnkhist}) $\to$ \texttt{gvkey}
-\item International: \texttt{comp.g\_security.ibtic} $\to$ \texttt{gvkey} (41K direct pairs)
-\item Combined: 62K unique IBES tickers linked to Compustat
-\end{itemize}
+\begin{frame}{2023 Snapshot: Regression-Based Country Effects}
+\centering
+\includegraphics[height=0.72\textheight]{scatter_fe_pe_er_2023.pdf}
 
-\vspace{0.1cm}
-\textbf{Coverage (forward P/E sample):}
-\begin{tabular}{@{}lccr@{}}
-\toprule
-Country & FY1 obs & LTG obs & \% of trailing sample \\
-\midrule
-USA & 84K & 34K & 45\% \\
-JPN & 31K & 2K & 52\% \\
-GBR & 14K & 4K & 65\% \\
-CHN & 4K & 0.4K & 7\% \\
-IND & 7K & 1K & 12\% \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.1cm}
-\footnotesize UK EPS in British Pence (BPN): divided by 100. Consensus requires $\geq$3 analysts.
+\vspace{0.05cm}
+\scriptsize Year-by-year regression FE (firm controls + 2-digit SIC industry FE). USA $= (0, 1)$. Korea: low P/E, high ER. Japan: high P/E. European markets cluster below USA.
 \end{frame}
 
-\begin{frame}{Market Cap Construction (Detail)}
+\begin{frame}{2023 Snapshot: Raw Country Medians (No Controls)}
+\centering
+\includegraphics[height=0.72\textheight]{scatter_raw_pe_er_2023.pdf}
+
+\vspace{0.05cm}
+\scriptsize Raw median P/E and expected return by country (no firm-level controls). Similar pattern to regression FE, confirming that country effects are not driven by model specification.
+\end{frame}
+
+\begin{frame}{Forward P/E and Expected Return: Distributions}
+\centering
+\includegraphics[width=0.95\textwidth]{outlier_diagnostics.pdf}
+
+\vspace{0.1cm}
+\scriptsize
+\textbf{Left:} Forward P/E distribution (winsorized 1/99\%, log-transformed in regressions).
+\textbf{Center:} Expected return (PTG/P$-$1, winsorized 2.5/97.5\%). Median = 16\% --- analysts are systematically optimistic.
+\textbf{Right:} Forward P/E by country (box plots, no fliers).
+\end{frame}
+
+\begin{frame}{Expected Return Distribution by Country}
+\centering
+\includegraphics[height=0.70\textheight]{boxplot_expret_by_country.pdf}
+
+\vspace{0.1cm}
+\scriptsize Korea median $\approx$ 30\%, Japan $\approx$ 13\%, USA $\approx$ 17\%. Analyst optimism is pervasive but cross-country differences in expected returns are real and persistent.
+\end{frame}
+
+\begin{frame}{IBES Linking and Coverage Details}
 \footnotesize
-\textbf{US firms}: \texttt{mkvalt} (pre-computed market value in USD millions). Available from 1986.
+\textbf{Linking:} US via ICLINK + CCM; International via \texttt{ibtic} (41K pairs). Total: 62K tickers.
 
-\vspace{0.1cm}
-\textbf{Non-US firms} (Compustat Global): no pre-computed market value.
-\begin{itemize}\setlength\itemsep{0pt}
-\item Compute: Market Cap = \texttt{cshoi} (shares outstanding) $\times$ \texttt{prccm} (month-end price)
-\item \textbf{Pitfall}: firms have multiple securities across exchanges and currencies
+\vspace{0.08cm}
+\textbf{Price data:} IBES \texttt{pansum} table. Price and consensus contemporaneous at \texttt{statpers} (3rd Thursday).
 
-\vspace{0.05cm}
-\emph{Example --- SAP SE (gvkey=103487) in Dec 2022:}
-\begin{tabular}{@{}llr@{}}
-iid=02W & EUR & 96.39 $\leftarrow$ \textcolor{accent}{correct} \\
-iid=05W & HUF & 38{,}620 $\leftarrow$ \textcolor{alert}{wrong currency!} \\
-iid=06W & MXN & 2{,}009 $\leftarrow$ \textcolor{alert}{wrong currency!} \\
-\end{tabular}
+\vspace{0.08cm}
+\textbf{Forward P/E} = \texttt{pansum.price} / \texttt{statsum.fy1\_eps} (both in IBES currency $\Rightarrow$ no FX noise). UK pence: ratio is correct.
 
-\item \textbf{Solution}: use \texttt{prirow} field (primary security designation)
-\end{itemize}
+\vspace{0.08cm}
+\textbf{Outliers:} Countries $<$100 obs excluded from 2nd stage. Year-by-year: $\geq$20 firms/country.
+\end{frame}
+
+\begin{frame}{Country Trajectories in (P/E, Expected Return) Space}
+\centering
+\includegraphics[height=0.68\textheight]{trajectory_pe_er_arrows.pdf}
 
 \vspace{0.05cm}
-All data in local currency (millions). Cross-country \emph{levels} absorbed by country FE.
+\scriptsize Median P/E and expected return minus USA median, per country-year ($\geq$20 firms).
+Arrow: 2002--2013 $\rightarrow$ 2014--2025 centroid. Korea: low P/E, high ER vs USA. India drifts to high P/E.
+\end{frame}
+
+\begin{frame}{Country Trajectories: Individual Paths}
+\centering
+\includegraphics[height=0.75\textheight]{trajectory_pe_er_panels.pdf}
+
+\vspace{0.05cm}
+\scriptsize Country-year medians minus USA. Circle = 2000, Square = 2025. Color: early (dark) to late (light).
 \end{frame}
 
 \end{document}

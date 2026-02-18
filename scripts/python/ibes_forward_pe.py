@@ -153,6 +153,17 @@ def download_all():
           AND medest IS NOT NULL
     """)
 
+    # --- IBES prices (from pansum) ---
+    # pansum has price + shares outstanding at each statpers date,
+    # same key as statsum → merge on ticker + statpers for P/E = price / EPS
+    data["pansum"] = cached_query(db, "ibes_pansum", """
+        SELECT ticker, statpers, price, shout, curr_price, usfirm
+        FROM ibes.pansum
+        WHERE statpers >= '2000-01-01'
+          AND price IS NOT NULL
+          AND price > 0
+    """)
+
     db.close()
     print("WRDS download complete.\n")
     return data

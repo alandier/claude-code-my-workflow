@@ -1,105 +1,91 @@
 ======================================================================
-FORWARD P/E BASELINE REGRESSIONS
+FORWARD P/E AND EXPECTED RETURN ANALYSIS
 ======================================================================
 
---- Pooled Panel Regressions ---
-Spec                         N      R²   σ(FE)   Ctry         Years
-(1) Base               150,143   0.133   0.556     76     2000-2024
-(2) + R&D              150,143   0.136   0.548     76     2000-2024
-(3) + LTG               43,680   0.145   0.707     58     2000-2024
-(4) + Macro             20,709   0.160   0.562     33     2008-2024
-(5) FY2 + all           44,805   0.132   0.745     58     2000-2024
+--- Forward P/E Regressions ---
+Spec                    N     R²   σ(FE)  Ctry        Years
+(A) Base          196,842  0.279  0.3578   102    2000-2025
+(B) + R&D         196,842  0.288  0.3560   102    2000-2025
+(C) + MTG         189,400  0.528  0.3357   101    2000-2025
+(C2) + LTG         51,953  0.372  0.3455    70    2000-2025
+(E) FY2 + MTG     189,400  0.322  0.3341   101    2000-2025
 
---- Key Coefficients from Spec (3) + LTG ---
-  leverage            : -0.8164 (SE=0.1445, t=-5.65)
-  log_at              : +0.0402 (SE=0.0387, t=+1.04)
-  lag_earn_growth     : -0.0078 (SE=0.0017, t=-4.46)
-  xrd_at              : +2.4447 (SE=0.2747, t=+8.90)
-  ltg                 : +0.0126 (SE=0.0024, t=+5.21)
+--- Expected Return Regressions ---
+Spec                    N     R²   σ(FE)  Ctry        Years
+(A) Base + MTG    162,204  0.286  0.1598   100    2000-2025
+(B) + R&D         162,204  0.286  0.1599   100    2000-2025
+(C') + LTG         50,901  0.346  0.0917    68    2000-2025
 
---- Country FE (pooled, baseline spec) ---
-    CYP: -3.949 (PE ratio: 0.02)
-    IMN: -1.254 (PE ratio: 0.29)
-    MHL: -1.153 (PE ratio: 0.32)
-    KOR: -0.972 (PE ratio: 0.38)
-    JPN: -0.772 (PE ratio: 0.46)
-    ROU: -0.764 (PE ratio: 0.47)
-    ARG: -0.760 (PE ratio: 0.47)
-    CHL: -0.717 (PE ratio: 0.49)
-    ARE: -0.691 (PE ratio: 0.50)
-    VGB: -0.677 (PE ratio: 0.51)
-    PER: -0.569 (PE ratio: 0.57)
-    GRC: -0.560 (PE ratio: 0.57)
-    GGY: -0.498 (PE ratio: 0.61)
-    BMU: -0.490 (PE ratio: 0.61)
-    SGP: -0.411 (PE ratio: 0.66)
-    ZAF: -0.409 (PE ratio: 0.66)
-    PAK: -0.398 (PE ratio: 0.67)
-    TWN: -0.349 (PE ratio: 0.71)
-    CYM: -0.339 (PE ratio: 0.71)
-    IDN: -0.265 (PE ratio: 0.77)
-    FRA: -0.257 (PE ratio: 0.77)
-    AUT: -0.255 (PE ratio: 0.78)
-    AUS: -0.245 (PE ratio: 0.78)
-    HKG: -0.215 (PE ratio: 0.81)
-    ISR: -0.214 (PE ratio: 0.81)
-    MUS: -0.196 (PE ratio: 0.82)
-    PHL: -0.146 (PE ratio: 0.86)
-    NLD: -0.118 (PE ratio: 0.89)
-    BEL: -0.103 (PE ratio: 0.90)
-    POL: -0.085 (PE ratio: 0.92)
-    JEY: -0.072 (PE ratio: 0.93)
-    THA: -0.067 (PE ratio: 0.93)
-    GBR: -0.064 (PE ratio: 0.94)
-    MEX: -0.060 (PE ratio: 0.94)
-    CHN: -0.038 (PE ratio: 0.96)
-    DEU: -0.030 (PE ratio: 0.97)
-    IRL: -0.003 (PE ratio: 1.00)
-    USA: +0.000 (PE ratio: 1.00)
-    ESP: +0.006 (PE ratio: 1.01)
-    LUX: +0.018 (PE ratio: 1.02)
-    BRA: +0.074 (PE ratio: 1.08)
-    NOR: +0.076 (PE ratio: 1.08)
-    TUR: +0.078 (PE ratio: 1.08)
-    SAU: +0.116 (PE ratio: 1.12)
-    ITA: +0.116 (PE ratio: 1.12)
-    CHE: +0.123 (PE ratio: 1.13)
-    CAN: +0.129 (PE ratio: 1.14)
-    COL: +0.131 (PE ratio: 1.14)
-    SWE: +0.157 (PE ratio: 1.17)
-    FIN: +0.182 (PE ratio: 1.20)
-    IND: +0.196 (PE ratio: 1.22)
-    MYS: +0.200 (PE ratio: 1.22)
-    PRT: +0.230 (PE ratio: 1.26)
-    NZL: +0.302 (PE ratio: 1.35)
-    DNK: +0.333 (PE ratio: 1.39)
-    RUS: +0.505 (PE ratio: 1.66)
-    EGY: +1.197 (PE ratio: 3.31)
-    QAT: +1.959 (PE ratio: 7.09)
+--- Decomposition: Country FE Reduction ---
+  Firm controls:      σ(FE) = 0.3560
+  + Expected return:  σ(FE) = 0.3066  (-13.9%)
+  + MTG:              σ(FE) = 0.3357  (-5.7%)
+  + Both:             σ(FE) = 0.2980  (-16.3%)
 
---- Second-Stage Regressions ---
-
-  Savings only (n=52): R²=0.085
-    savings_gni              : +0.0236 (t=+2.16)
-
-  Fin dev (mktcap+credit) (n=46): R²=0.083
-    mktcap_gdp               : +0.0008 (t=+1.13)
-    credit_gdp               : -0.0050 (t=-1.96)
-
-  Savings + Mktcap (n=48): R²=0.076
-    savings_gni              : +0.0220 (t=+1.91)
-    mktcap_gdp               : -0.0000 (t=-0.06)
-
-  Savings + Credit (n=49): R²=0.153
-    savings_gni              : +0.0278 (t=+2.48)
-    credit_gdp               : -0.0036 (t=-1.79)
-
-  Savings + ASD (n=44): R²=0.004
-    savings_gni              : -0.0000 (t=-0.00)
-    anti_self_dealing        : -0.0989 (t=-0.38)
-
-  Kitchen sink (n=40): R²=0.006
-    savings_gni              : -0.0003 (t=-0.03)
-    mktcap_gdp               : -0.0001 (t=-0.19)
-    credit_gdp               : -0.0003 (t=-0.20)
-    anti_self_dealing        : -0.0119 (t=-0.04)
+--- Country Effects (pooled, +MTG spec, USA=0, N>=100) ---
+    CYP: -0.816 (P/E vs USA: 0.44)
+    PAK: -0.745 (P/E vs USA: 0.47)
+    NGA: -0.638 (P/E vs USA: 0.53)
+    RUS: -0.629 (P/E vs USA: 0.53)
+    EGY: -0.628 (P/E vs USA: 0.53)
+    KEN: -0.558 (P/E vs USA: 0.57)
+    TUR: -0.551 (P/E vs USA: 0.58)
+    LKA: -0.542 (P/E vs USA: 0.58)
+    ARG: -0.520 (P/E vs USA: 0.59)
+    MHL: -0.501 (P/E vs USA: 0.61)
+    KOR: -0.495 (P/E vs USA: 0.61)
+    VGB: -0.454 (P/E vs USA: 0.64)
+    ROU: -0.447 (P/E vs USA: 0.64)
+    ZAF: -0.445 (P/E vs USA: 0.64)
+    OMN: -0.442 (P/E vs USA: 0.64)
+    BMU: -0.440 (P/E vs USA: 0.64)
+    HUN: -0.408 (P/E vs USA: 0.66)
+    PER: -0.402 (P/E vs USA: 0.67)
+    CYM: -0.377 (P/E vs USA: 0.69)
+    BRA: -0.356 (P/E vs USA: 0.70)
+    GGY: -0.351 (P/E vs USA: 0.70)
+    ARE: -0.295 (P/E vs USA: 0.74)
+    SGP: -0.269 (P/E vs USA: 0.76)
+    VNM: -0.265 (P/E vs USA: 0.77)
+    JEY: -0.260 (P/E vs USA: 0.77)
+    HKG: -0.251 (P/E vs USA: 0.78)
+    GRC: -0.249 (P/E vs USA: 0.78)
+    NOR: -0.246 (P/E vs USA: 0.78)
+    GBR: -0.235 (P/E vs USA: 0.79)
+    BEL: -0.235 (P/E vs USA: 0.79)
+    POL: -0.233 (P/E vs USA: 0.79)
+    IRL: -0.232 (P/E vs USA: 0.79)
+    NLD: -0.231 (P/E vs USA: 0.79)
+    QAT: -0.230 (P/E vs USA: 0.79)
+    PHL: -0.229 (P/E vs USA: 0.80)
+    MEX: -0.229 (P/E vs USA: 0.80)
+    MYS: -0.228 (P/E vs USA: 0.80)
+    THA: -0.218 (P/E vs USA: 0.80)
+    IDN: -0.214 (P/E vs USA: 0.81)
+    FRA: -0.206 (P/E vs USA: 0.81)
+    AUS: -0.181 (P/E vs USA: 0.83)
+    FIN: -0.179 (P/E vs USA: 0.84)
+    AUT: -0.178 (P/E vs USA: 0.84)
+    TWN: -0.167 (P/E vs USA: 0.85)
+    LUX: -0.167 (P/E vs USA: 0.85)
+    DEU: -0.160 (P/E vs USA: 0.85)
+    ISR: -0.146 (P/E vs USA: 0.86)
+    PRT: -0.137 (P/E vs USA: 0.87)
+    PAN: -0.136 (P/E vs USA: 0.87)
+    CZE: -0.123 (P/E vs USA: 0.88)
+    IND: -0.111 (P/E vs USA: 0.90)
+    ESP: -0.102 (P/E vs USA: 0.90)
+    NZL: -0.090 (P/E vs USA: 0.91)
+    SAU: -0.085 (P/E vs USA: 0.92)
+    SWE: -0.085 (P/E vs USA: 0.92)
+    CHL: -0.082 (P/E vs USA: 0.92)
+    DNK: -0.079 (P/E vs USA: 0.92)
+    ITA: -0.073 (P/E vs USA: 0.93)
+    KWT: -0.068 (P/E vs USA: 0.93)
+    CHE: -0.060 (P/E vs USA: 0.94)
+    COL: -0.032 (P/E vs USA: 0.97)
+    USA: +0.000 (P/E vs USA: 1.00)
+    CAN: +0.020 (P/E vs USA: 1.02)
+    JPN: +0.026 (P/E vs USA: 1.03)
+    CHN: +0.049 (P/E vs USA: 1.05)
+    MAR: +0.073 (P/E vs USA: 1.08)
