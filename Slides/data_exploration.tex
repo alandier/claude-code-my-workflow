@@ -146,7 +146,7 @@ FE: Country$\times$Year + SIC2$\times$Year throughout.
 \midrule
 Leverage & $-$0.12* & $-$0.10* & $-$0.18* & $-$0.32*** \\
 $\log(\text{Assets})$ & $-$0.04*** & $-$0.03** & $-$0.01 & $-$0.03*** \\
-Lag $\Delta$E & $-$0.003** & $-$0.002* & $+$0.001 & $-$0.005*** \\
+Lag $\Delta$E/|E| & $-$0.003** & $-$0.002* & $+$0.001 & $-$0.005*** \\
 R\&D / Assets & & $+$2.14*** & $+$1.86*** & $+$1.88*** \\
 MTG (FY2$-$FY1) & & & $+$1.17*** & \\
 IBES LTG (\%) & & & & $+$0.011*** \\
@@ -161,7 +161,7 @@ $\sigma(\hat\gamma_c)$ & \textcolor{alert}{\textbf{0.36}} & \textcolor{alert}{\t
 
 \vspace{0.05cm}
 \scriptsize
-\textbf{Key:} MTG doubles $R^2$ (0.29 $\to$ 0.53) but $\sigma(\hat\gamma_c)$ barely moves (0.36 $\to$ 0.34). Growth expectations explain \emph{within}-country P/E variation, not \emph{between}-country differences.
+\textbf{Key:} MTG doubles $R^2$ (0.29 $\to$ 0.53) but $\sigma(\hat\gamma_c)$ barely moves (0.36 $\to$ 0.34). Growth expectations explain \emph{within}-country P/E variation, not \emph{between}-country differences. Lag $\Delta$E/|E| $= (E_t - E_{t-1})/|E_{t-1}|$.
 \end{frame}
 
 \begin{frame}{What Does $\sigma(\hat\gamma_c) = 0.34$ Mean?}
@@ -175,11 +175,11 @@ $\sigma(\hat\gamma_c)$ & \textcolor{alert}{\textbf{0.36}} & \textcolor{alert}{\t
 $\sigma = 0.34$ in $\log(P/E)$ $\approx$ \textcolor{alert}{\textbf{40\% P/E premium}} for a one-$\sigma$ country.
 
 \vspace{0.15cm}
-\textbf{Concrete examples} (vs.\ USA $= 1$):
+\textbf{Concrete examples} (vs.\ USA):
 \renewcommand{\arraystretch}{0.90}
 \begin{tabular}{@{}lcc@{}}
 \toprule
-Country & P/E ratio & ER gap \\
+Country & P/E$^\dagger$ & ER$^\ddagger$ \\
 \midrule
 Korea & \textcolor{alert}{$0.61\times$} & $+$33pp \\
 UK & $0.79\times$ & $+$2pp \\
@@ -190,6 +190,9 @@ Japan & $1.03\times$ & $+$11pp \\
 China & $1.05\times$ & $+$6pp \\
 \bottomrule
 \end{tabular}
+
+\vspace{0.05cm}
+\scriptsize $^\dagger$exp($\hat\gamma_c$), USA$=1$. \; $^\ddagger$Analyst expected return vs USA (PTG/P$-$1).
 \renewcommand{\arraystretch}{1.0}
 \end{column}
 \begin{column}{0.48\textwidth}
@@ -249,7 +252,7 @@ and firm controls barely shrink them.\\[0.5cm]
 \midrule
 Leverage & $+$0.05* & $+$0.05* & $+$0.10*** \\
 $\log(\text{Assets})$ & $-$0.02*** & $-$0.02*** & $-$0.01*** \\
-Lag $\Delta$E & $-$0.003*** & $-$0.003*** & $-$0.006*** \\
+Lag $\Delta$E/|E| & $-$0.003*** & $-$0.003*** & $-$0.006*** \\
 MTG (FY2$-$FY1) & $-$0.03** & $-$0.03** & \\
 R\&D / Assets & & $+$0.07 & $+$0.44*** \\
 IBES LTG (\%) & & & $+$0.002*** \\
@@ -360,48 +363,50 @@ Asia ex-China: persistently $+$10--30pp above USA. Europe: near zero. America (e
 \begin{frame}{What Predicts the Country P/E Effect?}
 \vspace{-0.2cm}
 \begin{columns}[T]
-\begin{column}{0.52\textwidth}
+\begin{column}{0.50\textwidth}
 \centering
 \includegraphics[width=\textwidth]{scatter_crosscountry_vs_pe.pdf}
 \end{column}
-\begin{column}{0.45\textwidth}
+\begin{column}{0.47\textwidth}
 \footnotesize
 \vspace{-0.1cm}
 
-\textbf{Dep.\ var:} country P/E effect $\hat\gamma_c$\\
-(time-averaged, USA $= 1$, 66 ctry)
+\textbf{Dep.\ var:} country FE $\hat\gamma_c$\\
+(time-averaged, USA $= 0$, 66 ctry)
 
 \vspace{0.1cm}
 \renewcommand{\arraystretch}{0.90}
-\begin{tabular}{@{}lccc@{}}
+\scriptsize
+\begin{tabular}{@{}lcc|cc@{}}
 \toprule
-\textbf{Predictor} & $r$ & $t$ & $n$ \\
+& \multicolumn{2}{c|}{\textbf{P/E}} & \multicolumn{2}{c}{\textbf{Exp.\ Ret.}} \\
+\textbf{Predictor} & $r$ & $t$ & $r$ & $t$ \\
 \midrule
-\textbf{Mkt Cap / GDP} & $+$\textbf{0.48} & \textbf{3.96} & 55 \\
-\textbf{Credit / GDP} & $+$\textbf{0.39} & \textbf{3.20} & 58 \\
-\textbf{log(GDP/cap)} & $+$\textbf{0.33} & \textbf{2.69} & 62 \\
-\textbf{Savings / GNI} & $+$\textbf{0.29} & \textbf{2.28} & 60 \\
+\textbf{Mkt Cap / GDP} & $+$\textbf{.48} & \textbf{3.96} & $-$.22 & $-$1.63 \\
+\textbf{Credit / GDP} & $+$\textbf{.39} & \textbf{3.20} & $-$.15 & $-$1.10 \\
+\textbf{log(GDP/cap)} & $+$\textbf{.33} & \textbf{2.69} & \textbf{$-$.31} & \textbf{$-$2.57} \\
+\textbf{Savings / GNI} & $+$\textbf{.29} & \textbf{2.28} & $-$.15 & $-$1.13 \\
 \midrule
-Anti-Self-Dealing & $+$0.24 & 1.69 & 49 \\
+Anti-Self-Dealing & $+$.24 & 1.69 & $-$.18 & $-$1.28 \\
 \bottomrule
 \end{tabular}
 \renewcommand{\arraystretch}{1.0}
 
 \vspace{0.1cm}
 \scriptsize
-Financial development and income predict P/E. Standard governance variables (anti-self-dealing) do \textbf{not}, contrary to La Porta et al.\ (2002).
+Financial development and income predict P/E. ER signs are consistent but mostly insignificant --- only log(GDP/cap) significant.
 \end{column}
 \end{columns}
 \end{frame}
 
-\begin{frame}{France and Germany: A Growing P/E Discount}
+\begin{frame}{France, Germany \& UK: A Growing P/E Discount}
 \centering
 \includegraphics[height=0.68\textheight]{trajectory_fra_deu.pdf}
 
 \vspace{0.05cm}
 \scriptsize
-Saturated year-by-year regressions (size, leverage, R\&D, MTG, 2-digit SIC industry FE). USA $= 1.0$.
-France and Germany: from parity (2000) to $0.6$--$0.73\times$ (2024). \textbf{The discount is widening, not closing.}
+Year-by-year regressions (size, leverage, R\&D, MTG, 2-digit SIC industry FE). USA $= 1.0$.
+All three: from near parity (2000) to $0.57$--$0.67\times$ (2024). \textbf{The discount is widening, not closing.}
 \end{frame}
 
 % ===================================================================

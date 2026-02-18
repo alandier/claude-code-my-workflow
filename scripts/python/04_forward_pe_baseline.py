@@ -1413,19 +1413,23 @@ for ext in ["pdf", "png"]:
 plt.close(fig)
 print("  Saved scatter_crosscountry_vs_pe")
 
-# Fig 7: France & Germany P/E trajectory (saturated spec with MTG)
+# Fig 7: France, Germany & UK P/E trajectory (saturated spec with MTG)
 fra_sat = ce_sat[ce_sat["fic"] == "FRA"].sort_values("fyear")
 deu_sat = ce_sat[ce_sat["fic"] == "DEU"].sort_values("fyear")
+gbr_sat = ce_sat[ce_sat["fic"] == "GBR"].sort_values("fyear")
 if len(fra_sat) >= 3 and len(deu_sat) >= 3:
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.plot(fra_sat["fyear"], np.exp(fra_sat["country_effect"]),
             label="France", linewidth=2.5, color="#2980b9")
     ax.plot(deu_sat["fyear"], np.exp(deu_sat["country_effect"]),
             label="Germany", linewidth=2.5, color="#c0392b")
+    if len(gbr_sat) >= 3:
+        ax.plot(gbr_sat["fyear"], np.exp(gbr_sat["country_effect"]),
+                label="UK", linewidth=2.5, color="#27ae60")
     ax.axhline(1.0, color="gray", linewidth=0.8, linestyle=":", label="USA = 1.0")
     ax.set_xlabel("Year", fontsize=11)
     ax.set_ylabel("Forward P/E relative to USA", fontsize=11)
-    ax.set_title("France and Germany: Forward P/E Discount vs USA\n"
+    ax.set_title("France, Germany & UK: Forward P/E Discount vs USA\n"
                  "(controls: size, leverage, R&D, MTG, 2-digit SIC industry FE)",
                  fontsize=10)
     ax.legend(fontsize=10, loc="upper right")
