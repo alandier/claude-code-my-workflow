@@ -19,8 +19,8 @@
 \graphicspath{{../output/diagnostics/}{../output/regressions/}}
 
 % --- Metadata ---
-\title{The Cross-Country P/E Puzzle}
-\subtitle{Why Do Identical Firms Trade at Different Multiples?}
+\title{P/E Varies Across Countries}
+\subtitle{Cross-Country Differences in Valuation Multiples}
 \author{Augustin Landier}
 \institute{HEC Paris}
 \date{February 2026}
@@ -126,6 +126,12 @@ $\geq$3 analysts required for consensus.\\
 FE: Country$\times$Year + SIC2$\times$Year throughout.
 \end{column}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Sample Size by Country}
+\vspace{-0.2cm}
+\centering
+\includegraphics[height=0.85\textheight]{country_firm_counts.pdf}
 \end{frame}
 
 % ===================================================================
@@ -399,14 +405,22 @@ Financial development and income predict P/E. ER signs are consistent but mostly
 \end{columns}
 \end{frame}
 
-\begin{frame}{France, Germany \& UK: A Growing P/E Discount}
+\begin{frame}{France, Germany \& UK: P/E Discount and Expected Return}
+\vspace{-0.2cm}
+\begin{columns}[T]
+\begin{column}{0.49\textwidth}
 \centering
-\includegraphics[height=0.68\textheight]{trajectory_fra_deu.pdf}
+\includegraphics[width=\textwidth]{trajectory_fra_deu.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{trajectory_er_fra_deu.pdf}
+\end{column}
+\end{columns}
 
 \vspace{0.05cm}
 \scriptsize
-Year-by-year regressions (size, leverage, R\&D, MTG, 2-digit SIC industry FE). USA $= 1.0$.
-All three: from near parity (2000) to $0.57$--$0.67\times$ (2024). \textbf{The discount is widening, not closing.}
+Year-by-year regressions (size, leverage, R\&D, MTG, SIC2 industry FE). P/E discount widens from parity to $0.57$--$0.67\times$ (2024), yet ER gap remains small ($+$2--7pp). \textbf{Discount rates do not explain the European P/E discount.}
 \end{frame}
 
 % ===================================================================
@@ -472,6 +486,24 @@ All three: from near parity (2000) to $0.57$--$0.67\times$ (2024). \textbf{The d
 \item Da--Warachka (2011) --- analyst forecasts and the cross-section of expected returns.
 \item Bradshaw et al.\ (2012) --- analysts' forecasts reflect risk differentials.
 \end{itemize}
+\end{frame}
+
+\begin{frame}{P/E Dispersion Within Europe}
+\vspace{-0.3cm}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\centering
+\includegraphics[width=\textwidth]{europe_pe_dispersion.pdf}
+\end{column}
+\begin{column}{0.43\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter_pension_vs_pe.pdf}
+\end{column}
+\end{columns}
+
+\vspace{-0.1cm}
+\scriptsize
+\textbf{Within Europe:} Denmark and Sweden recently at or above USA; France, Germany, UK at $0.6$--$0.8\times$. \textbf{Funded pension hypothesis:} countries with large pension fund assets (Nordics, Switzerland) have higher P/E --- but correlation is weak globally ($r = 0.16$, $t = 1.08$). Netherlands ($173\%$ pension/GDP, $0.79\times$ P/E) is a counterexample.
 \end{frame}
 
 % ===================================================================
